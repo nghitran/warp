@@ -1,0 +1,37 @@
+---
+table: warp_avatar
+from: null
+to: warp_1
+sql: |
+  CREATE TABLE warp_avatar (
+    id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(64),
+    password VARCHAR(32),
+    UNIQUE(email)
+  ) engine=InnoDB, charset=utf8;
+
+---
+table: warp_session
+from: null
+to: warp_1
+depends:
+  - [warp_avatar, warp_1]
+sql: |
+  CREATE TABLE warp_session (
+    uid VARBINARY(32) NOT NULL PRIMARY KEY,
+    avatar_id INTEGER REFERENCES warp_avatar(id) ON DELETE CASCADE
+  ) engine=InnoDB, charset=utf8;
+
+---
+table: warp_avatar_role
+from: null
+to: warp_1
+depends:
+  - [warp_avatar, warp_1]
+sql: |
+  CREATE TABLE warp_avatar_role (
+    id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    avatar_id INTEGER NOT NULL REFERENCES warp_avatar(id) ON DELETE CASCADE,
+    role_name VARBINARY(32) NOT NULL,
+    position INTEGER NOT NULL
+  ) engine=InnoDB, charset=utf8;

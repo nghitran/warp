@@ -5,8 +5,11 @@ from storm.locals import *
 from warp import runtime
 from warp.common import access
 
+from warp.common.schema import stormSchema
 
+@stormSchema.versioned
 class Avatar(Storm):
+    __version__ = "warp_1"
     __storm_table__ = "warp_avatar"
 
     id = Int(primary=True)
@@ -67,7 +70,11 @@ class SessionManager(object):
         return md5("%s_%s" % (str(random.random()) , str(self.counter))).hexdigest()
 
 
+@stormSchema.versioned
 class DBSession(Storm):
+    # FIXME HXP: This breaks integration with MySQL and SQLite, but those are
+    # not working anyway due to the missing touched column.
+    __version__ = "hxp_2"
     __storm_table__ = "warp_session"
 
     uid = RawStr(primary=True)
@@ -130,7 +137,9 @@ class DBSession(Storm):
 # ---------------------------
 
 
+@stormSchema.versioned
 class AvatarRole(Storm):
+    __version__ = "warp_1"
     __storm_table__ = "warp_avatar_role"
 
     id = Int(primary=True)

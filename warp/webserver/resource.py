@@ -33,7 +33,7 @@ class WarpResourceWrapper(object):
         siteTemplateDir = config['siteDir'].child("templates").path
         warpTemplateDir = self.warpTemplatePath.path
         nodeDir = config['siteDir'].child("nodes").path
-        templateLookup.__init__(directories=[siteTemplateDir, warpTemplateDir, nodeDir], 
+        templateLookup.__init__(directories=[siteTemplateDir, warpTemplateDir, nodeDir],
                                 output_encoding="utf-8")
 
         handle_login = config.get('loginHandler', self.handle_login)
@@ -100,8 +100,6 @@ class WarpResourceWrapper(object):
         node = helpers.getNode(firstSegment)
 
         if node is not None:
-            if not access.allowed(request.avatar, node):
-                return AccessDenied()
             return NodeResource(node)
 
         return NoResource()
@@ -202,9 +200,10 @@ class NodeResource(object):
             self.facetName = segment
             self.renderFunc = renderFunc
             self.isLeaf = True
+            self.args = [x for x in request.postpath if x]
 
             # Perform an additional check before rendering the response
-            if not access.allowed(request.avatar, self.node, facetName=segment):
+            if not access.allowed(request.avatar, self.node, facetName=segment, resourceArgs=self.args):
                 return AccessDenied()
             response = self.getResponse(request)
 
@@ -218,16 +217,12 @@ class NodeResource(object):
 
         subNode = self.getSubNode(segment)
         if subNode is not None:
-            if not access.allowed(request.avatar, subNode):
-                return AccessDenied()
             return NodeResource(subNode)
 
         return NoResource()
 
 
     def getResponse(self, request):
-        self.args = [x for x in request.postpath if x]
-
         request.node = self.node
         request.resource = self
 
