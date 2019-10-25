@@ -105,7 +105,6 @@ def doStartup(options):
     if hasattr(configModule, 'startup'):
         configModule.startup()
 
-
 def loadConfig(options):
     """Load the Warp config"""
     siteDir = FilePath(options['siteDir'])
@@ -125,7 +124,11 @@ def loadConfig(options):
     store.setupStore()
     translate.loadMessages()
 
-    factory = site.WarpSite(resource.WarpResourceWrapper())
+    if options.get('logFormatter'):
+        factory = site.WarpSite(resource.WarpResourceWrapper(), logFormatter=options['logFormatter'])
+    else:
+        factory = site.WarpSite(resource.WarpResourceWrapper())
+
     runtime.config['warpSite'] = factory
 
     return configModule
