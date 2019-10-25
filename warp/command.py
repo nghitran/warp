@@ -124,10 +124,7 @@ def loadConfig(options):
     store.setupStore()
     translate.loadMessages()
 
-    if options.get('logFormatter'):
-        factory = site.WarpSite(resource.WarpResourceWrapper(), logFormatter=options['logFormatter'])
-    else:
-        factory = site.WarpSite(resource.WarpResourceWrapper())
+    factory = site.WarpSite(resource.WarpResourceWrapper())
 
     runtime.config['warpSite'] = factory
 
