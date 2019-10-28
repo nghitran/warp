@@ -66,13 +66,13 @@ class WarpSite(Site):
         in here.
         """
         if hasattr(self, "logFile"):
-            session_id = 'AWSALB=%s' % (getattr(request, "albCookie", None))
-            org_id = 'ORG=%s' % (getattr(request, "org_id", None))
+            session_id = 'AWSALB=%s' % (getattr(request, "albCookie", "None"))
+            org_id = 'ORG=%s' % (getattr(request, "org_id", "None"))
             line = '%s %s %s - "%s" %d %s "%s" "%s"\n' % (
                 request.getClientIP(),
+                session_id, org_id,
                 # request.getUser() or "-", # the remote user is almost never important
                 '%s %s %s' % (self._escape(request.method),
-                              session_id, org_id,
                               self._escape(request.uri),
                               self._escape(request.clientproto)),
                 request.code,
