@@ -16,7 +16,6 @@ Then run::
   twistd -n warp
 
 You should now have a simple working warp site at http://localhost:8080.
-
 If you want to know more about what just happened, see :ref:`somedetails`.
 
 
