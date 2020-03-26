@@ -10,11 +10,6 @@ from warp.runtime import avatar_store, config, sql
 def setupStore():
     avatar_store.__init__(create_database(config['db']))
 
-    if config.get('trace'):
-        import sys
-        from storm.tracer import debug
-        debug(True, stream=sys.stdout)
-
     # Only sqlite uses this now
     sqlBundle = getCreationSQL(avatar_store)
     if not sqlBundle:
@@ -24,7 +19,6 @@ def setupStore():
 
     for (table, creationSQL) in sqlBundle['creations']:
         if not tableExists(avatar_store, table):
-
             # Unlike log.message, this works during startup
             print("~~~ Creating Warp table '%s'" % table)
 
