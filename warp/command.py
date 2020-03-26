@@ -106,14 +106,15 @@ def doStartup(options):
 
 def initialize(options):
     """Load Warp config and intialize"""
-    siteDir = FilePath(options['siteDir'])
-    sys.path.insert(0, siteDir.path)
+    site_dir = FilePath(options['siteDir'])
+    sys.path.insert(0, site_dir.path)
 
-    configModule = reflect.namedModule(options['config'])
-    config = configModule.config
+    print("Loading config from {}".format(options['config']))
+    config_module = reflect.namedModule(options['config'])
+    config = config_module.config
     runtime.config.update(config)
 
-    runtime.config['siteDir'] = siteDir
+    runtime.config['siteDir'] = site_dir
     runtime.config['warpDir'] = FilePath(runtime.__file__).parent()
 
     if options["skipSchemaCheck"]:
@@ -127,7 +128,7 @@ def initialize(options):
 
     runtime.config['warpSite'] = factory
 
-    return configModule
+    return config_module
 
 
 # Pre-defined commands -----------------------------------------------
@@ -142,8 +143,8 @@ def skeleton(options):
     "Copy Warp site skeleton into current directory"
     from warp.tools import skeleton
     print('Creating skeleton...')
-    siteDir = getSiteDir(options)
-    skeleton.createSkeleton(siteDir)
+    site_dir = getSiteDir(options)
+    skeleton.createSkeleton(site_dir)
 
 @register()
 def node(options, name):
