@@ -150,11 +150,7 @@ pages:
 
 .. code-block:: python
 
-    [...]
-
     crudColumns = ("name", "birthdate", "photo", "description", "cash")
-
-    [...]
 
 Now your CRUD pages should have a textarea for ``description``, image upload
 and display for ``photo``, and a (rather poorly implemented) price widget for
