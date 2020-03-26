@@ -16,7 +16,7 @@ class WarpServiceMaker(object):
     def makeService(self, options):
         command.maybeRun(options)
 
-        configModule = command.initialize(options)
+        config_module = command.initialize(options)
         config = runtime.config
         port = config['port']
         factory = config['warpSite']
@@ -28,8 +28,8 @@ class WarpServiceMaker(object):
         else:
             service = internet.TCPServer(port, factory)
 
-        if hasattr(configModule, 'mungeService'):
-            service = configModule.mungeService(service)
+        if hasattr(config_module, 'mungeService'):
+            service = config_module.mungeService(service)
 
         command.doStartup(options)
         return service
