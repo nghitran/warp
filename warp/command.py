@@ -1,8 +1,9 @@
+from __future__ import print_function
 import sys
 
 from inspect import getargspec
 
-from twisted.python import usage, reflect
+from twisted.python import usage, reflect, log
 from twisted.python.filepath import FilePath
 
 from warp.webserver import resource, site
@@ -21,7 +22,6 @@ class Options(usage.Options):
     )
 
     subCommands = []
-
 
 _commands = {}
 
@@ -69,7 +69,7 @@ def register(shortName=None, skipConfig=False, needStartup=False, optionsParser=
 
         def wrapped(options):
             if not skipConfig:
-                loadConfig(options)
+                initialize(options)
             if needStartup:
                 doStartup(options)
             fn(options, *options.subOptions.get("args", ()))
@@ -89,13 +89,12 @@ def maybeRun(options):
 
 
 def getSiteDir(options):
-    """Utility function to get the `siteDir` out of `options`"""
+    """Get `siteDir` out of `options`"""
     return FilePath(options['siteDir'])
 
 
 def doStartup(options):
-    """Utility function to execute the startup function, after
-    checking the schema if necessary"""
+    """Execute startup function after checking schema if necessary"""
     from warp.common.schema import getConfig
     if getConfig()["check"]:
         from warp.common import schema
@@ -105,8 +104,8 @@ def doStartup(options):
     if hasattr(configModule, 'startup'):
         configModule.startup()
 
-def loadConfig(options):
-    """Load the Warp config"""
+def initialize(options):
+    """Load Warp config and intialize"""
     siteDir = FilePath(options['siteDir'])
     sys.path.insert(0, siteDir.path)
 
@@ -133,19 +132,18 @@ def loadConfig(options):
 
 # Pre-defined commands -----------------------------------------------
 
-
 class SkeletonOptions(usage.Options):
     optParameters = (
         ("siteDir", "d", ".", "Base directory of the warp site to generate"),
     )
+
 @register(skipConfig = True, optionsParser = SkeletonOptions)
 def skeleton(options):
     "Copy Warp site skeleton into current directory"
     from warp.tools import skeleton
-    print 'Creating skeleton...'
+    print('Creating skeleton...')
     siteDir = getSiteDir(options)
     skeleton.createSkeleton(siteDir)
-
 
 @register()
 def node(options, name):
@@ -153,10 +151,9 @@ def node(options, name):
     from warp.tools import skeleton
     nodes = getSiteDir(options).child('nodes')
     if not nodes.exists():
-        print 'Please run this from a Warp site directory'
+        print('Please run this from a Warp site directory')
         return
     skeleton.createNode(nodes, name)
-
 
 @register()
 def crud(options, name, model):
@@ -164,17 +161,15 @@ def crud(options, name, model):
     from warp.tools import autocrud
     nodes = getSiteDir(options).child('nodes')
     if not nodes.exists():
-        print 'Please run this from a Warp site directory'
+        print('Please run this from a Warp site directory')
         return
     autocrud.autocrud(nodes, name, model)
-
 
 @register()
 def adduser(options):
     "Add a user (interactive)"
     from warp.tools import adduser
     adduser.addUser()
-
 
 @register(needStartup = True)
 def console(options):
@@ -184,13 +179,11 @@ def console(options):
     c = code.InteractiveConsole(locals)
     c.interact()
 
-
 @register(needStartup = True, shortName = "c")
 def command(options, function):
     "Run a site-specific command"
     obj = reflect.namedObject(function)
     obj()
-
 
 class SchemaOptions(usage.Options):
     optFlags = (
