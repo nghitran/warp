@@ -124,9 +124,7 @@ def initialize(options):
     store.setupStore()
     translate.loadMessages()
 
-    factory = site.WarpSite(resource.WarpResourceWrapper())
-
-    runtime.config['warpSite'] = factory
+    runtime.config['warpSite'] = site.WarpSite(resource.WarpResourceWrapper())
 
     return config_module
 
