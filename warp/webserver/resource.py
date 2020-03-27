@@ -19,7 +19,9 @@ if '.ico' not in static.File.contentTypes:
     static.File.contentTypes['.ico'] = 'image/vnd.microsoft.icon'
 
 class WarpResourceWrapper(object):
-    "Root Resource for Site"
+    """
+    Root Resource for Site
+    """
     implements(IResource)
 
     isLeaf = False
@@ -45,11 +47,12 @@ class WarpResourceWrapper(object):
 
         self.caseInsensitiveUrl = False
 
-    def getChildWithDefault(self, firstSegment, request):
-        "Return a child with the given name for the given request."
-
+    def getChildWithDefault(self, first_segment, request):
+        """
+        Return a child with the given name for the given request.
+        """
         # Serve request for static file
-        if firstSegment:
+        if first_segment:
             fp = self.buildFilePath(request)
             if fp is not None:
                 del request.postpath[:]
@@ -59,38 +62,38 @@ class WarpResourceWrapper(object):
         session = request.getSession()
         request.avatar = session.avatar
 
-        getRequestStore = config.get('getRequestStore')
-        if getRequestStore is not None:
-            request.store = getRequestStore(request)
+        get_request_store = config.get('getRequestStore')
+        if get_request_store is not None:
+            request.store = get_request_store(request)
         else:
             request.store = avatar_store
 
         if request.avatar is not None:
-            getUser = config.get('getRequestUser')
-            if getUser is not None:
-                request.avatar.user = getUser(request)
+            get_user = config.get('getRequestUser')
+            if get_user is not None:
+                request.avatar.user = get_user(request)
             else:
                 # Backward compatibility
-                getUser = config.get('getAppUser')
-                if getUser is not None:
+                get_user = config.get('getAppUser')
+                if get_user is not None:
                     warnings.warn("getAppUser is deprecated, use getRequestUser instead",
                                   DeprecationWarning)
-                    request.avatar.user = getUser(request.avatar)
+                    request.avatar.user = get_user(request.avatar)
 
         if config.get('reloadMessages'):
             translate.loadMessages()
 
         request.translateTerm = translate.getTranslator(session.language)
 
-        segment = firstSegment
+        segment = first_segment
         if self.caseInsensitiveUrl:
-            segment = firstSegment.lower()
+            segment = first_segment.lower()
 
         handler = self.dispatch.get(segment)
         if handler:
             return handler(request)
 
-        node = helpers.getNode(firstSegment)
+        node = helpers.getNode(first_segment)
         if node:
             return NodeResource(node)
 
@@ -102,7 +105,9 @@ class WarpResourceWrapper(object):
         self.dispatch[path] = lambda r: child
 
     def buildFilePath(self, request):
-        "Get FilePath for request if static file exists and is valid"
+        """
+        Get FilePath for request if static file exists and is valid
+        """
         file_path = config['siteDir'].child('static')
         for segment in request.path.split('/'):
             try:
@@ -114,19 +119,27 @@ class WarpResourceWrapper(object):
             return file_path
 
     def handleLogin(self, request):
-        "Handler for login requests"
+        """
+        Handler for login requests
+        """
         return auth.LoginHandler()
 
     def handleLogout(self, request):
-        "Handler for logout requests"
+        """
+        Handler for logout requests
+        """
         return auth.LogoutHandler()
 
     def handleComet(self, request):
-        "Handler for comet requests"
+        """
+        Handler for comet requests
+        """
         return NodeResource(comet)
 
     def handleWarpstatic(self, request):
-        "Handler for static files"
+        """
+        Handler for static files
+        """
         file_path = self.warpStaticPath
         for segment in request.path.split('/')[2:]:
             try:
@@ -141,7 +154,9 @@ class WarpResourceWrapper(object):
         return NoResource()
 
     def handleDefault(self, request):
-        "Default Handler"
+        """
+        Default Handler
+        """
         return Redirect(config['default'])
 
 
@@ -188,8 +203,8 @@ class NodeResource(object):
         if not segment:
             return Redirect(request.childLink('index'))
 
-        renderFunc = self.getRenderFunc(segment)
-        if renderFunc is not None:
+        render_func = self.getRenderFunc(segment)
+        if render_func is not None:
             self.facetName = segment
             self.renderFunc = render_func
             self.isLeaf = True
