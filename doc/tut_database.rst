@@ -3,7 +3,7 @@ Using The Database
 
 Let's set up a simple table for people.
 
-.. code-block:: sql
+.. code-block:: shell
 
   $ sqlite3 warp.sqlite
   SQLite version 3.5.9
@@ -34,7 +34,6 @@ directory, in ``models.py``.
       id = Int(primary=True)
       name = Unicode(default=u'')
       birthdate = DateTime(default_factory = lambda: datetime.datetime(1970, 1, 1))
-
 
 And then we'll write some view code in ``nodes/people/index.mak``:
 
@@ -79,7 +78,6 @@ console:
   <models.Person object at 0xa45c64c>
   >>> store.commit()
 
-
 Now reload http://localhost:8080/people/index and you should see::
 
   There are 1 people in the database:
@@ -96,6 +94,7 @@ Let's give each person their own page with their details. We'll put it in the
 .. code-block:: mako
 
   <%inherit file="/site.mak"/>
+
   <%
   from models import Person
   id = int(request.resource.args[0])
@@ -113,7 +112,6 @@ it, you should see::
 
   Brendon
   Date of Birth: 08/15/81
-
 
 Finally, we'll change our list code in ``nodes/people/index.mak`` to link each
 person to their view page:

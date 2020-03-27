@@ -107,7 +107,6 @@ Warp's custom column types:
       name = columns.NonEmptyUnicode(default=u'')
       birthdate = DateTime(default_factory = lambda: datetime.datetime(1970, 1, 1))
 
-
 ``NonEmptyUnicode`` is a subclass of Storm's regular ``Unicode`` column type.
 It behaves exactly the same, but Warp maps it to a ``column proxy`` (see
 :ref:`below<column-proxies>`) which rejects empty values.
@@ -187,8 +186,8 @@ As well as ``render_*`` and ``render_list_*``, you can also write
 ``render_edit_*`` and ``save_*`` methods, but we'll skip right over those for
 now and talk about ``column proxies`` instead.
 
-
 .. _column-proxies:
+
 
 Column Proxies
 --------------
@@ -256,7 +255,6 @@ a tiny font and disallowing shouting. We'll put it in
 
           setattr(self.obj, self.col, val)
 
-
 We're staying away from ``render_edit`` for this example, since it needs more
 explanation.
 
@@ -271,9 +269,7 @@ Add it to our Person model:
 .. code-block:: python
 
   class Person(Storm):
-
       [...]
-
       quote = Unicode()
 
 Finally, we add it to ``CrudPerson.crudColumns``, and tell it to use our new
@@ -282,11 +278,8 @@ Finally, we add it to ``CrudPerson.crudColumns``, and tell it to use our new
 .. code-block:: python
 
   class CrudPerson(CrudModel):
-
     [...]
-
     crudColumns = ("name", "birthdate", "photo", "description", "cash", "quote")
-
     [...]
 
     def render_proxy_quote(self, request):
