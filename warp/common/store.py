@@ -7,6 +7,7 @@ from storm.uri import URI
 from storm.locals import *
 from storm.exceptions import DatabaseError
 
+from warp import runtime
 from warp.runtime import avatar_store, config, sql
 
 from txpostgres import txpostgres
