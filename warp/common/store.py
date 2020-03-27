@@ -1,14 +1,43 @@
 from __future__ import print_function
 from twisted.python import log
 
-from storm.locals import *
+from storm.database import create_database
+from storm.twisted.store import StorePool
 from storm.uri import URI
+from storm.locals import *
 from storm.exceptions import DatabaseError
 
 from warp.runtime import avatar_store, config, sql
 
+from txpostgres import txpostgres
+from txpostgres.reconnection import DeadConnectionDetector
+
+def start_storm_pool(database, config):
+    """
+    Start Storm db pool
+    """
+    min_size = config.get('db_pool_min', 3)
+    max_size = config.get('db_pool_max', 10)
+    pool = StorePool(database, min_size, max_size)
+    pool.start()
+    runtime.pool = pool
+
 def setupStore():
-    avatar_store.__init__(create_database(config['db']))
+    uri = URI(config['db'])
+    print("Connecting to database {} as user {}".format(uri.database, uri.username))
+    database = create_database(uri)
+
+    # Single db connection
+    runtime.avatar_store.__init__(database)
+
+    if config.get('trace'):
+        import sys
+        from storm.tracer import debug
+        debug(True, stream=sys.stdout)
+
+    # Conection pool
+    # start_storm_pool(database, config)
+    # print("Started storm pool")
 
     # Only sqlite uses this now
     sqlBundle = getCreationSQL(avatar_store)
