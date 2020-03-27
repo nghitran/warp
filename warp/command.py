@@ -89,12 +89,16 @@ def maybeRun(options):
 
 
 def getSiteDir(options):
-    """Get `siteDir` out of `options`"""
+    """
+    Get `siteDir` out of `options`
+    """
     return FilePath(options['siteDir'])
 
 
 def doStartup(options):
-    """Execute startup function after checking schema if necessary"""
+    """
+    Execute startup function after checking schema if necessary
+    """
     from warp.common.schema import getConfig
     if getConfig()["check"]:
         from warp.common import schema
@@ -105,7 +109,9 @@ def doStartup(options):
         configModule.startup()
 
 def initialize(options):
-    """Load Warp config and intialize"""
+    """
+    Load Warp config and intialize
+    """
     site_dir = FilePath(options['siteDir'])
     sys.path.insert(0, site_dir.path)
 
@@ -138,7 +144,9 @@ class SkeletonOptions(usage.Options):
 
 @register(skipConfig = True, optionsParser = SkeletonOptions)
 def skeleton(options):
-    "Copy Warp site skeleton into current directory"
+    """
+    Copy Warp site skeleton into current directory
+    """
     from warp.tools import skeleton
     print('Creating skeleton...')
     site_dir = getSiteDir(options)
@@ -146,7 +154,9 @@ def skeleton(options):
 
 @register()
 def node(options, name):
-    "Create a new node"
+    """
+    Create a new node
+    """
     from warp.tools import skeleton
     nodes = getSiteDir(options).child('nodes')
     if not nodes.exists():
@@ -156,7 +166,9 @@ def node(options, name):
 
 @register()
 def crud(options, name, model):
-    "Create a new CRUD node"
+    """
+    Create a new CRUD node
+    """
     from warp.tools import autocrud
     nodes = getSiteDir(options).child('nodes')
     if not nodes.exists():
@@ -166,13 +178,17 @@ def crud(options, name, model):
 
 @register()
 def adduser(options):
-    "Add a user (interactive)"
+    """
+    Add a user (interactive)
+    """
     from warp.tools import adduser
     adduser.addUser()
 
 @register(needStartup = True)
 def console(options):
-    "Python console with Warp runtime available"
+    """
+    Python console with Warp runtime available
+    """
     import code
     locals = {'store': runtime.store}
     c = code.InteractiveConsole(locals)
@@ -180,7 +196,9 @@ def console(options):
 
 @register(needStartup = True, shortName = "c")
 def command(options, function):
-    "Run a site-specific command"
+    """
+    Run a site-specific command
+    """
     obj = reflect.namedObject(function)
     obj()
 
@@ -191,12 +209,16 @@ class SchemaOptions(usage.Options):
 
 @register(optionsParser = SchemaOptions)
 def snapshotSchema(options):
-    "Snapshot the DB schema (useful for converting existing projects)"
+    """
+    Snapshot the DB schema (useful for converting existing projects)
+    """
     from warp.common import schema
     schema.snapshot(dryRun = True if options.subOptions["dryRun"] else False)
 
 @register(optionsParser = SchemaOptions)
 def migrate(options):
-    "Migrate the DB to meet the code's expectation"
+    """
+    Migrate the DB to meet the code's expectation
+    """
     from warp.common import schema
     schema.migrate(dryRun = True if options.subOptions["dryRun"] else False)
