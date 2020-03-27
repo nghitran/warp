@@ -104,9 +104,9 @@ def doStartup(options):
         from warp.common import schema
         schema.migrate()
 
-    configModule = reflect.namedModule(options['config'])
-    if hasattr(configModule, 'startup'):
-        configModule.startup()
+    config_module = reflect.namedModule(options['config'])
+    if hasattr(config_module, 'startup'):
+        config_module.startup()
 
 def initialize(options):
     """
