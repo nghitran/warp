@@ -5,7 +5,6 @@ from storm.database import create_database
 from storm.twisted.store import StorePool
 from storm.uri import URI
 from storm.locals import *
-from storm.exceptions import DatabaseError
 
 from warp import runtime
 from warp.runtime import avatar_store, config, sql
@@ -24,6 +23,9 @@ def start_storm_pool(database, config):
     runtime.pool = pool
 
 def setupStore():
+    """
+    Start connection to db
+    """
     uri = URI(config['db'])
     print("Connecting to database {} as user {}".format(uri.database, uri.username))
     database = create_database(uri)
@@ -31,10 +33,10 @@ def setupStore():
     # Single db connection
     runtime.avatar_store.__init__(database)
 
-    if config.get('trace'):
-        import sys
-        from storm.tracer import debug
-        debug(True, stream=sys.stdout)
+    # if config.get('trace'):
+    #     import sys
+    #     import storm.tracer
+    #     storm.tracer.debug(True, stream=sys.stdout)
 
     # Conection pool
     # start_storm_pool(database, config)
