@@ -34,7 +34,6 @@ class Avatar(Storm):
         return self._roles
     roles = property(_getRoles)
 
-
     def __repr__(self):
         return "<Avatar '%s'>" % self.email.encode("utf-8")
 
@@ -67,7 +66,7 @@ class SessionManager(object):
         from twisted.python.hashlib import md5
         import random
         self.counter = self.counter + 1
-        return md5("%s_%s" % (str(random.random()) , str(self.counter))).hexdigest()
+        return md5("%s_%s" % (str(random.random()), str(self.counter))).hexdigest()
 
 
 @stormSchema.versioned
@@ -110,7 +109,6 @@ class DBSession(Storm):
             del _MESSAGES[self.uid]
         return messages
 
-
     def hasAvatar(self):
         return self.avatar_id is not None
 
@@ -133,9 +131,7 @@ class DBSession(Storm):
     def __repr__(self):
         return "<Session '%s'>" % self.uid
 
-
 # ---------------------------
-
 
 @stormSchema.versioned
 class AvatarRole(Storm):
