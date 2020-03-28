@@ -1,11 +1,13 @@
+"""
+Site customizations
+"""
 from storm.locals import *
 
 from twisted.web.server import Session, Site, Request
 
 from warp.common.avatar import Avatar
 from warp.runtime import config, avatar_store
-from warp.common.avatar import SessionManager #DBSession
-
+from warp.common.avatar import SessionManager # DBSession
 
 class WarpRequest(Request):
     def finish(self):
@@ -48,9 +50,10 @@ class WarpSite(Site):
             return session
 
         if session.hasAvatar():
-            maxAge = config.get("sessionMaxAge")
-            if maxAge is not None and session.age() > maxAge:
-                session.addFlashMessage("You were logged out due to inactivity", _domain="_warp:login")
+            max_age = config.get("sessionMaxAge")
+            if max_age is not None and session.age() > max_age:
+                session.addFlashMessage("You were logged out due to inactivity",
+                                        _domain="_warp:login")
                 session.setAvatarID(None)
 
         return session
