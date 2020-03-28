@@ -97,6 +97,7 @@ Let's give each person their own page with their details. We'll put it in the
 
   <%
   from models import Person
+
   id = int(request.resource.args[0])
   person = store.get(Person, id)
   %>
