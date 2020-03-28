@@ -1,11 +1,13 @@
-import sys, urllib, urllib2
-
-from twisted.python import util, filepath
+import sys
+import urllib
+import urllib2
 
 from mako.template import Template
 
-from warp.runtime import templateLookup, config, exposedStormClasses
+from twisted.python import util, filepath
+import warp.log as log
 
+from warp.runtime import templateLookup, config, exposedStormClasses
 
 def antispam(renderer):
     '''
@@ -30,9 +32,7 @@ def antispam(renderer):
         return renderer(request)
     return wrapped
 
-
 def getNode(name):
-
     bits = name.split('/')
     leaf = bits[-1]
 
@@ -46,57 +46,50 @@ def getNode(name):
             return None
         raise
 
-
 def getCrudClass(cls):
     return exposedStormClasses[cls.__name__][1]
 
 def getCrudObj(obj):
     return getCrudClass(obj.__class__)(obj)
 
-
 def getCrudNode(crudClass):
     # XXX WHAT - God, what *should* this do??
     return sys.modules[crudClass.__module__]
 
-
-
-def renderTemplateObj(request, template, **kw):
-    if kw.pop("return_unicode", False): renderFunc = template.render_unicode
-    else: renderFunc = template.render
-
-    return renderFunc(node=request.node,
-                      request=request,
-                      store=request.store,
-                      facet=request.resource.facetName,
-                      args=request.resource.args,
-                      t=request.translateTerm,
-                      **kw)
-
-def getTemplate(templatePath):
-    return Template(filename=templatePath,
+def getTemplate(template_path):
+    return Template(filename=template_path,
                     lookup=templateLookup,
                     format_exceptions=config.get('makoErrorPages', True),
                     output_encoding="utf-8")
 
-def renderTemplate(request, templatePath, **kw):
-    template = getTemplate(templatePath)
+def renderTemplate(request, template_path, **kw):
+    template = getTemplate(template_path)
     return renderTemplateObj(request, template, **kw)
 
+def renderTemplateObj(request, template, **kw):
+    if kw.pop("return_unicode", False):
+        render_func = template.render_unicode
+    else:
+        render_func = template.render
+
+    return render_func(node=request.node,
+                       request=request,
+                       store=request.store,
+                       facet=request.resource.facetName,
+                       args=request.resource.args,
+                       t=request.translateTerm,
+                       **kw)
 
 def getLocalTemplatePath(request, filename):
     return util.sibpath(request.node.__file__, filename)
 
-
 def renderLocalTemplate(request, filename, **kw):
-    return renderTemplate(request,
-                          getLocalTemplatePath(request, filename),
-                          **kw)
-
+    path = getLocalTemplatePath(request, filename)
+    return renderTemplate(request, path, **kw)
 
 def nodeSegments(node):
     nodeDir = filepath.FilePath(node.__file__).parent()
     return nodeDir.segmentsFrom(config['siteDir'].child("nodes"))
-
 
 def url(node, facet="index", args=(), query=()):
     segments = nodeSegments(node)
