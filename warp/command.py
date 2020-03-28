@@ -4,7 +4,6 @@ from inspect import getargspec
 
 from twisted.python import usage, reflect, log
 from twisted.python.filepath import FilePath
-# from twisted.internet.defer import waitForDeferred, succeed, fail
 
 from warp.webserver import resource, site
 from warp.common import store, translate
