@@ -37,6 +37,8 @@ class WarpResourceWrapper(object):
             config['siteDir'].child('nodes').path
         ], output_encoding="utf-8")
 
+        # Configure special URLs to point to handlers which can may be
+        # overridden by app
         self.dispatch = {
             '__login__': config.get('loginHandler', self.handleLogin),
             '__logout__': config.get('logoutHandler', self.handleLogout),
