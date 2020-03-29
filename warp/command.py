@@ -12,14 +12,14 @@ from warp.common import schema
 from warp.tools import skeleton, adduser, autocrud
 
 class Options(usage.Options):
-    optParameters = (
-        ("siteDir", "d", ".", "Base directory of the warp site"),
-        ("config", "w", "warpconfig", "Config filename"),
-    )
+    optParameters = [
+        ["siteDir", "d", ".", "Base directory of the warp site"],
+        ["config", "w", "warpconfig", "Config module"],
+    ]
 
-    optFlags = (
-        ("skipSchemaCheck", "x", "Don't check schema integrity"),
-    )
+    optFlags = [
+        ["skipSchemaCheck", "x", "Don't check schema integrity"],
+    ]
 
     subCommands = []
 
