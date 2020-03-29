@@ -15,6 +15,7 @@ class Options(usage.Options):
     optParameters = [
         ["siteDir", "d", ".", "Base directory of the warp site"],
         ["config", "w", "warpconfig", "Config module"],
+        ["port", "p", 8092, "Port number to listen on.", int],
     ]
 
     optFlags = [
@@ -162,9 +163,9 @@ def initialize(options):
 # Pre-defined commands -----------------------------------------------
 
 class SkeletonOptions(usage.Options):
-    optParameters = (
-        ("siteDir", "d", ".", "Base directory of the warp site to generate"),
-    )
+    optParameters = [
+        ["siteDir", "d", ".", "Base directory of the warp site to generate"],
+    ]
 
 @register(skipConfig=True, optionsParser=SkeletonOptions)
 def skeleton(options):

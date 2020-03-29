@@ -5,15 +5,15 @@ import warnings
 
 from zope.interface import implements
 
-from twisted.python.filepath import FilePath, InsecurePath
-from twisted.web.resource import IResource, NoResource
-from twisted.web import static
 from twisted.python import log
+from twisted.python.filepath import FilePath, InsecurePath
+from twisted.web import static
+from twisted.web.resource import IResource, NoResource
 
-from warp.common import access, translate
-from warp.webserver import auth, comet
-from warp.runtime import avatar_store, pool, config, templateLookup
 from warp import helpers
+from warp.common import access, translate
+from warp.runtime import avatar_store, pool, config, templateLookup
+from warp.webserver import auth, comet
 
 if '.ico' not in static.File.contentTypes:
     static.File.contentTypes['.ico'] = 'image/vnd.microsoft.icon'
@@ -29,12 +29,12 @@ class WarpResourceWrapper(object):
     def __init__(self):
         self.warpBasePath = config['warpDir']
         self.warpStaticPath = self.warpBasePath.child('static')
-        self.warpTemplatePath = self.warpBasePath.child("templates")
+        self.warpTemplatePath = self.warpBasePath.child('templates')
 
         templateLookup.__init__(directories=[
-            config['siteDir'].child("templates").path,
+            config['siteDir'].child('templates').path,
             self.warpTemplatePath.path,
-            config['siteDir'].child("nodes").path
+            config['siteDir'].child('nodes').path
         ], output_encoding="utf-8")
 
         self.dispatch = {

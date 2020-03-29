@@ -14,11 +14,14 @@ class WarpServiceMaker(object):
     options = command.Options
 
     def makeService(self, options):
+        """
+        Construct Warp service.
+        """
         command.maybeRun(options)
 
         config_module = command.initialize(options)
         config = runtime.config
-        port = config['port']
+        port = options['port']
         factory = config['warpSite']
 
         if config.get('ssl'):

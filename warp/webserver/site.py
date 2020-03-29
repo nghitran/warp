@@ -1,13 +1,12 @@
 """
 Site customizations
 """
-from storm.locals import *
-
 from twisted.web.server import Session, Site, Request
 
-from warp.common.avatar import Avatar
+from storm.locals import *
+
 from warp.runtime import config, avatar_store
-from warp.common.avatar import SessionManager # DBSession
+from warp.common.avatar import Avatar, SessionManager # DBSession
 
 class WarpRequest(Request):
     def finish(self):
@@ -63,6 +62,7 @@ class WarpSite(Site):
         In superclass, updates log datetime periodically for performance.
         Now handled at a higher level, e.g. journald.
         """
+        pass
 
     def log(self, request):
         """
