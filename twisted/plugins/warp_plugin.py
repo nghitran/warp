@@ -1,8 +1,8 @@
 from zope.interface import implements
 
-from twisted.plugin import IPlugin
 from twisted.application.service import IServiceMaker
 from twisted.application import internet
+from twisted.plugin import IPlugin
 
 from warp.iwarp import IWarpService
 from warp import runtime, command
