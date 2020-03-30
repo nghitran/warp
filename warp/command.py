@@ -106,7 +106,7 @@ def doStartup(options):
         config_module.startup()
 
 def cb_pool_started(result):
-    log.msg("Started tx_pool")
+    print("Started tx_pool")
     runtime.tx_pool = result
 
 def start_tx_pool(uri, min_conn=3):
