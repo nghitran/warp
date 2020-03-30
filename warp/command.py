@@ -155,7 +155,10 @@ def initialize(options):
 
     translate.loadMessages()
 
-    runtime.config['warpSite'] = site.WarpSite(resource.WarpResourceWrapper())
+    # runtime.config['warpSite'] = site.WarpSite(resource.WarpResourceWrapper())
+    site_module = runtime.config.get('siteModule', site.WarpSite)
+    resource_module = runtime.config.get('resourceModule', resource.WarpResourceWrapper)
+    runtime.config['warpSite'] = site_module(resource_module)
 
     return config_module
 
