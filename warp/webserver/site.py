@@ -2,6 +2,7 @@
 Site customizations
 """
 from twisted.web.server import Session, Site, Request
+from twisted.python import log
 
 from storm.locals import *
 
@@ -66,21 +67,18 @@ class WarpSite(Site):
 
     def log(self, request):
         """
-        Log request result.
+        Log a request's result to the logfile, by default in combined log format.
         """
-        if hasattr(self, "logFile"):
-            session_id = 'AWSALB=%s' % (getattr(request, "albCookie", "None"))
-            org_id = 'ORG=%s' % (getattr(request, "org_id", "None"))
-            line = '%s %s %s - "%s" %d %s "%s" "%s"\n' % (
-                request.getClientIP(),
-                session_id, org_id,
-                # request.getUser() or "-", # the remote user is almost never important
-                # self._logDateTime, # timestamp handled at higher level, e.g. journald
-                '%s %s %s' % (self._escape(request.method),
-                              self._escape(request.uri),
-                              self._escape(request.clientproto)),
-                request.code,
-                request.sentLength or "-",
-                self._escape(request.getHeader("referer") or "-"),
-                self._escape(request.getHeader("user-agent") or "-"))
-            self.logFile.write(line)
+        log.msg("request_headers: %r" % [[k, v] for k, v in request.requestHeaders.getAllRawHeaders()])
+        line = '%s - - %s "%s" %d %s "%s" "%s"\n' % (
+            request.getClientIP(),
+            # request.getUser() or "-", # the remote user is almost never important
+            self._logDateTime,
+            '%s %s %s' % (self._escape(request.method),
+                          self._escape(request.uri),
+                          self._escape(request.clientproto)),
+            request.code,
+            request.sentLength or "-",
+            self._escape(request.getHeader("referer") or "-"),
+            self._escape(request.getHeader("user-agent") or "-"))
+        log.msg(line)
