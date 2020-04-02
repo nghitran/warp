@@ -41,6 +41,9 @@ class WarpServiceMaker(object):
             # 'sshPort': "tcp:%s:interface=127.0.0.1" % port,
             'namespace': {'service': warp_service, 'store': runtime.store},
             'passwd': options['consolePasswd'] or console_config.get("passwd_file"),
+            'sshKeyDir': options['sshKeyDir'],
+            'sshKeyName': options['sshKeyName'],
+            'sshKeySize': options['sshKeySize'],
         })
 
         warp_service.setServiceParent(svc)
