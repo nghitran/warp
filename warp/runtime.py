@@ -1,10 +1,13 @@
 """
 Globally-accessible stuff (like the store) initialised at runtime, not import-time
 """
+import sys
 
 from storm.locals import Store
 from warp.common.events import CommitEventStore
 from mako.lookup import TemplateLookup
+
+log = sys.stdout
 
 # Thanks to _habnabit for this clever trick!
 avatar_store = CommitEventStore.__new__(CommitEventStore)
