@@ -16,6 +16,9 @@ class Options(usage.Options):
         ["siteDir", "d", ".", "Base directory of the warp site"],
         ["config", "w", "warpconfig", "Config module"],
         ["port", "p", 8092, "Port number to listen on.", int],
+        ["sshPort", "c", None, "Console port (strports) for SSH"],
+        ["telnetPort", "t", None, "Console port (strports) for telnet"],
+        ["consolePasswd", "P", None, "Console passwd file"]
     ]
 
     optFlags = [
