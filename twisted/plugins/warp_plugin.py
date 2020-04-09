@@ -20,8 +20,9 @@ class WarpServiceMaker(object):
         """
         command.maybeRun(options)
 
-        config_module = command.initialize(options)
+        config_module = command.loadConfig(options)
         config = runtime.config
+
         port = options['port']
         factory = config['warpSite']
 
