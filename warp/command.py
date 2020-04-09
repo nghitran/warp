@@ -11,6 +11,9 @@ from warp import runtime
 from warp.common import schema
 from warp.tools import skeleton, adduser, autocrud
 
+from txpostgres import txpostgres
+from txpostgres.reconnection import DeadConnectionDetector
+
 class Options(usage.Options):
     optParameters = [
         ["siteDir", "d", ".", "Base directory of the warp site"],
@@ -77,7 +80,7 @@ def register(shortName=None, skipConfig=False, needStartup=False, optionsParser=
 
         def wrapped(options):
             if not skipConfig:
-                initialize(options)
+                loadConfig(options)
             if needStartup:
                 doStartup(options)
             fn(options, *options.subOptions.get("args", ()))
@@ -102,11 +105,27 @@ def getSiteDir(options):
 
 def doStartup(options):
     """
-    Execute startup function after checking schema if necessary
+    Execute startup function
     """
-    from warp.common.schema import getConfig
-    if getConfig()["check"]:
+
+    # Set up db connection
+    store.setupStore()
+
+    if options['migrate']:
         schema.migrate()
+
+    # from warp.common.schema import getConfig
+    # if getConfig()["check"]:
+    #     schema.migrate()
+
+    # if options["skipSchemaCheck"]:
+    #     runtime.config["schema"] = runtime.config.get("schema", {})
+    #     runtime.config["schema"]["check"] = False
+
+    # d = start_tx_pool(uri, 3)
+    # d.addCallback(cb_pool_started)
+
+    translate.loadMessages()
 
     config_module = reflect.namedModule(options['config'])
     if hasattr(config_module, 'startup'):
@@ -135,9 +154,9 @@ def start_tx_pool(uri, min_conn=3):
         min=min_conn
     ).start()
 
-def initialize(options):
+def loadConfig(options):
     """
-    Load Warp config and intialize
+    Load Warp config
     """
     site_dir = FilePath(options['siteDir'])
     sys.path.insert(0, site_dir.path)
@@ -149,18 +168,6 @@ def initialize(options):
 
     runtime.config['siteDir'] = site_dir
     runtime.config['warpDir'] = FilePath(runtime.__file__).parent()
-
-    if options["skipSchemaCheck"]:
-        runtime.config["schema"] = runtime.config.get("schema", {})
-        runtime.config["schema"]["check"] = False
-
-    # Set up db connection
-    store.setupStore()
-
-    # d = start_tx_pool(uri, 3)
-    # d.addCallback(cb_pool_started)
-
-    translate.loadMessages()
 
     # runtime.config['warpSite'] = site.WarpSite(resource.WarpResourceWrapper())
     site_module = runtime.config.get('siteModule', site.WarpSite)
@@ -234,9 +241,9 @@ def command(options, function):
     obj()
 
 class SchemaOptions(usage.Options):
-    optFlags = (
-        ("dryRun", "n", "Do a dry-run instead of changing the DB for real"),
-    )
+    optFlags = [
+        ["dryRun", "n", "Do a dry-run instead of changing the DB for real"],
+    ]
 
 @register(optionsParser=SchemaOptions)
 def snapshotSchema(options):
