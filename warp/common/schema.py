@@ -1,3 +1,4 @@
+from __future__ import print_function
 from warp.runtime import avatar_store, config
 
 from schemup.orms import storm
@@ -47,16 +48,16 @@ def getConfig(config=config):
 
 
 def loadWarpMigrations(store=avatar_store):
-    print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    print "Loading warp migrations..."
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    print("Loading warp migrations...")
     warpMigrationsDir = getWarpMigrationsDir(store)
     if not warpMigrationsDir.isdir():
         raise Exception("Warp migrations dir not found")
     commands.load(warpMigrationsDir.path)
 
 def loadSiteMigrations(config=config):
-    print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    print "Loading site migrations..."
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    print("Loading site migrations...")
     schemaConfig = getConfig(config)
     siteMigrationsDir = schemaConfig["migrations_dir"]
     # NTA TODO: Blow up otherwise?
@@ -68,12 +69,11 @@ def loadMigrations(store=avatar_store, config=config):
     loadSiteMigrations(config)
 
 
-
 def snapshot(store=avatar_store, config=config, dryRun=False):
     schema = makeSchema(store, dryRun)
     if schema is None:
-        print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-        print "Migrations not supported for", getConnectionClassName(store)
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        print("Migrations not supported for", getConnectionClassName(store))
         return
 
     loadMigrations(store, config)
@@ -84,27 +84,27 @@ def snapshot(store=avatar_store, config=config, dryRun=False):
 def migrate(store=avatar_store, config=config, dryRun=False):
     schema = makeSchema(store, dryRun)
     if schema is None:
-        print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-        print "Migrations not supported for", getConnectionClassName(store)
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        print("Migrations not supported for", getConnectionClassName(store))
         return
 
     schema.ensureSchemaTable()
 
     # Make sure the real schema is what schemup_tables says it is
-    print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    print "Checking schema integrity..."
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    print("Checking schema integrity...")
     mismatches = validator.findSchemaMismatches(schema)
     # NTA TODO: Pretty print
     if mismatches:
-        print "Real schema & 'schemup_tables' are out of sync (did you change the schema outside of schemup?):"
+        print("Real schema and schemup_tables are out of sync (did you change the schema outside of schemup?):")
         for mismatch in mismatches:
-            print mismatch, "\n"
+            print(mismatch, "\n")
         raise Exception("Schema mismatches")
 
     loadMigrations(store, config)
 
-    print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    print "Upgrading..."
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    print("Upgrading...")
     sqls = commands.upgrade(schema, stormSchema)
 
     # Sanity checking
@@ -121,15 +121,15 @@ def migrate(store=avatar_store, config=config, dryRun=False):
     store.rollback()
 
     if not sqls:
-        print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-        print "Schema up-to-date"
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        print("Schema up-to-date")
     elif dryRun:
-        print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         for sql in sqls:
-            print ""
-            print sql
+            print("")
+            print(sql)
     else:
-        print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-        print "Migrated successfully"
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        print("Migrated successfully")
 
-    print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
