@@ -34,6 +34,7 @@ internal = {
 
 exposedStormClasses = {}
 
+# Translations of messages for internationalization
 messages = {}
 
 def expose(modelClass, crudClass):

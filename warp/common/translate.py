@@ -1,6 +1,4 @@
 import operator
-import os.path
-import glob
 
 try:
     import json
@@ -18,9 +16,10 @@ def defaultLoader():
     loadMessageDir(config['siteDir'].child('messages'))
 
 def getTranslator(language):
-    langDict = messages.get(language, {})
+    lang_dict = messages.get(language, {})
+
     def t(term, *args, **kwargs):
-        namespace = langDict
+        namespace = lang_dict
 
         domain = kwargs.pop("_domain", None)
         if domain is not None:
@@ -50,12 +49,12 @@ def getTranslator(language):
 # --------------------------------------- #
 
 def loadMessageDir(messageDir):
-    for languageFile in messageDir.globChildren('*.json'):
-        language = languageFile.basename().split('.', 1)[0]
+    for language_file in messageDir.globChildren('*.json'):
+        language = language_file.basename().split('.', 1)[0]
 
-        content = json.load(languageFile.open('rb'))
-        langDict = messages.setdefault(language, {})
-        _mergeDicts(content, langDict)
+        content = json.load(language_file.open('rb'))
+        lang_dict = messages.setdefault(language, {})
+        _mergeDicts(content, lang_dict)
 
 def _mergeDicts(update, target, prefix=[]):
     for k, v in update.iteritems():
