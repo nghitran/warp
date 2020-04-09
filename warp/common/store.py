@@ -9,9 +9,6 @@ from storm.locals import *
 from warp import runtime
 from warp.runtime import avatar_store, config, sql
 
-from txpostgres import txpostgres
-from txpostgres.reconnection import DeadConnectionDetector
-
 def start_storm_pool(database, config):
     """
     Start Storm db pool
@@ -43,13 +40,13 @@ def setupStore():
     # print("Started storm pool")
 
     # Only sqlite uses this now
-    sqlBundle = getCreationSQL(avatar_store)
-    if not sqlBundle:
+    sql_bundle = getCreationSQL(avatar_store)
+    if not sql_bundle:
         return
 
-    tableExists = sql['tableExists'] = sqlBundle['tableExists']
+    tableExists = sql['tableExists'] = sql_bundle['tableExists']
 
-    for (table, creationSQL) in sqlBundle['creations']:
+    for (table, creationSQL) in sql_bundle['creations']:
         if not tableExists(avatar_store, table):
             # Unlike log.message, this works during startup
             print("~~~ Creating Warp table '%s'" % table)
