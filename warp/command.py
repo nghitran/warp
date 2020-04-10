@@ -11,8 +11,6 @@ from warp import runtime
 from warp.common import schema
 from warp.tools import skeleton, adduser, autocrud
 
-from txpostgres import txpostgres
-from txpostgres.reconnection import DeadConnectionDetector
 
 class Options(usage.Options):
     optParameters = [
@@ -108,51 +106,27 @@ def doStartup(options):
     Execute startup function
     """
 
-    # Set up db connection
-    store.setupStore()
-
-    if options['migrate']:
-        schema.migrate()
-
-    # from warp.common.schema import getConfig
-    # if getConfig()["check"]:
-    #     schema.migrate()
-
-    # if options["skipSchemaCheck"]:
-    #     runtime.config["schema"] = runtime.config.get("schema", {})
-    #     runtime.config["schema"]["check"] = False
-
-    # d = start_tx_pool(uri, 3)
-    # d.addCallback(cb_pool_started)
-
     translate.loadMessages()
 
+    # Run app custom startup function or default
     config_module = reflect.namedModule(options['config'])
     if hasattr(config_module, 'startup'):
-        config_module.startup()
+        config_module.startup(options)
+    else:
+        # Set up db connection
+        store.setupStore(config_module['db'])
 
-def cb_pool_started(result):
-    print("Started tx_pool")
-    runtime.tx_pool = result
+        # if config.get('trace'):
+        #     import sys
+        #     import storm.tracer
+        #     storm.tracer.debug(True, stream=sys.stdout)
 
-def start_tx_pool(uri, min_conn=3):
-    """
-    Start txpostgres connection pool.
-    Returns a deferred that fires when the pool is ready.
-    """
-    def connection_factory(self, *args, **kwargs):
-        kwargs['detector'] = DeadConnectionDetector()
-        return txpostgres.Connection(*args, **kwargs)
+        # Migrate database
+        # This used to be on by default, controlled by
+        # options["skipSchemaCheck"], now it's off by default
+        if options['migrate']:
+            schema.migrate()
 
-    txpostgres.ConnectionPool.connectionFactory = connection_factory
-    return txpostgres.ConnectionPool(
-        None,
-        dbname=uri.database,
-        user=uri.username,
-        password=uri.password,
-        host=uri.host,
-        min=min_conn
-    ).start()
 
 def loadConfig(options):
     """

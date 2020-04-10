@@ -1,65 +1,49 @@
-from __future__ import print_function
 from twisted.python import log
 
-from storm.database import create_database
-from storm.twisted.store import StorePool
-from storm.uri import URI
-from storm.locals import *
+import storm.database
+import storm.uri
+# from storm.locals import *
 
-from warp import runtime
-from warp.runtime import avatar_store, config, sql
+from warp.runtime import avatar_store, sql
 
-def start_storm_pool(database, config):
+def setupStore(db_uri):
     """
-    Start Storm db pool
+    Connect to database
     """
-    min_size = config.get('db_pool_min', 3)
-    max_size = config.get('db_pool_max', 10)
-    pool = StorePool(database, min_size, max_size)
-    pool.start()
-    runtime.pool = pool
-
-def setupStore():
-    """
-    Start connection to db
-    """
-    uri = URI(config['db'])
-    print("Connecting to database {} as user {}".format(uri.database, uri.username))
-    database = create_database(uri)
+    uri = storm.uri.URI(db_uri)
+    log.msg("Connecting to database {} as user {}".format(uri.database, uri.username))
+    database = storm.database.create_database(uri)
 
     # Single db connection
-    runtime.avatar_store.__init__(database)
-
-    # if config.get('trace'):
-    #     import sys
-    #     import storm.tracer
-    #     storm.tracer.debug(True, stream=sys.stdout)
-
-    # Conection pool
-    # start_storm_pool(database, config)
-    # print("Started storm pool")
+    avatar_store.__init__(database)
 
     # Only sqlite uses this now
-    sql_bundle = getCreationSQL(avatar_store)
+    sql_bundle = getCreationSQL(avatar_store, db_uri)
     if not sql_bundle:
-        return
+        return database
 
     tableExists = sql['tableExists'] = sql_bundle['tableExists']
 
     for (table, creationSQL) in sql_bundle['creations']:
         if not tableExists(avatar_store, table):
             # Unlike log.message, this works during startup
-            print("~~~ Creating Warp table '%s'" % table)
+            log.msg("~~~ Creating Warp table '%s'" % table)
 
-            if not isinstance(creationSQL, tuple): creationSQL = [creationSQL]
-            for sqlCmd in creationSQL: avatar_store.execute(sqlCmd)
+            if not isinstance(creationSQL, tuple):
+                creationSQL = [creationSQL]
+            for sqlCmd in creationSQL:
+                avatar_store.execute(sqlCmd)
             avatar_store.commit()
 
-def getCreationSQL(store):
-    connType = store._connection.__class__.__name__
+    return database
+
+
+def getCreationSQL(store, db_uri):
+    conn_type = store._connection.__class__.__name__
     return {
         'SQLiteConnection': {
-            'tableExists': lambda s, t: bool(s.execute("SELECT count(*) FROM sqlite_master where name = '%s'" % t).get_one()[0]),
+            'tableExists': lambda s, t: bool(s.execute(
+                """SELECT count(*) FROM sqlite_master where name = '%s'""" % t).get_one()[0]),
             'creations': [
                 ('warp_avatar', """
                 CREATE TABLE warp_avatar (
@@ -80,10 +64,11 @@ def getCreationSQL(store):
                 ],
             },
         'MySQLConnection': {
-            'tableExists': lambda s, t: bool(s.execute("""
-                   SELECT count(*) FROM information_schema.tables
-                   WHERE table_schema = ? AND table_name=?""",
-               (URI(config['db']).database, t)).get_one()[0]),
+            'tableExists': lambda s, t: bool(s.execute(
+                """SELECT count(*)
+                   FROM information_schema.tables
+                   WHERE table_schema = ? AND table_name=?
+                """, (storm.uri.URI(db_uri).database, t)).get_one()[0]),
             'creations': [
                 ('warp_avatar', """
                 CREATE TABLE warp_avatar (
@@ -106,4 +91,4 @@ def getCreationSQL(store):
                   ) engine=InnoDB, charset=utf8"""),
                 ],
             },
-    }.get(connType)
+    }.get(conn_type)
