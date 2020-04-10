@@ -6,7 +6,7 @@ import storm.uri
 
 from warp.runtime import avatar_store, sql
 
-def setupStore(db_uri):
+def setup_store(db_uri):
     """
     Connect to database
     """
@@ -18,31 +18,31 @@ def setupStore(db_uri):
     avatar_store.__init__(database)
 
     # Only sqlite uses this now
-    sql_bundle = getCreationSQL(avatar_store, db_uri)
+    sql_bundle = _get_creation_sql(avatar_store, db_uri)
     if not sql_bundle:
         return database
 
-    tableExists = sql['tableExists'] = sql_bundle['tableExists']
+    table_exists = sql['table_exists'] = sql_bundle['table_exists']
 
     for (table, creation_sql) in sql_bundle['creations']:
-        if not tableExists(avatar_store, table):
+        if not table_exists(avatar_store, table):
             # Unlike log.message, this works during startup
             log.msg("~~~ Creating Warp table '%s'" % table)
 
             if not isinstance(creation_sql, tuple):
                 creation_sql = [creation_sql]
-            for sqlCmd in creation_sql:
-                avatar_store.execute(sqlCmd)
+            for sql_cmd in creation_sql:
+                avatar_store.execute(sql_cmd)
             avatar_store.commit()
 
     return database
 
 
-def getCreationSQL(store, db_uri):
+def _get_creation_sql(store, db_uri):
     conn_type = store._connection.__class__.__name__
     return {
         'SQLiteConnection': {
-            'tableExists': lambda s, t: bool(s.execute(
+            'table_exists': lambda s, t: bool(s.execute(
                 """SELECT count(*) FROM sqlite_master where name = '%s'""" % t).get_one()[0]),
             'creations': [
                 ('warp_avatar', """
@@ -64,7 +64,7 @@ def getCreationSQL(store, db_uri):
                 ],
             },
         'MySQLConnection': {
-            'tableExists': lambda s, t: bool(s.execute(
+            'table_exists': lambda s, t: bool(s.execute(
                 """SELECT count(*)
                    FROM information_schema.tables
                    WHERE table_schema = ? AND table_name=?

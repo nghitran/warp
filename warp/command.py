@@ -114,7 +114,7 @@ def doStartup(options):
         config_module.startup(options)
     else:
         # Set up db connection
-        store.setupStore(config_module['db'])
+        store.setup_store(config_module['db'])
 
         # if config.get('trace'):
         #     import sys
