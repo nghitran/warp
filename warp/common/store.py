@@ -24,14 +24,14 @@ def setupStore(db_uri):
 
     tableExists = sql['tableExists'] = sql_bundle['tableExists']
 
-    for (table, creationSQL) in sql_bundle['creations']:
+    for (table, creation_sql) in sql_bundle['creations']:
         if not tableExists(avatar_store, table):
             # Unlike log.message, this works during startup
             log.msg("~~~ Creating Warp table '%s'" % table)
 
-            if not isinstance(creationSQL, tuple):
-                creationSQL = [creationSQL]
-            for sqlCmd in creationSQL:
+            if not isinstance(creation_sql, tuple):
+                creation_sql = [creation_sql]
+            for sqlCmd in creation_sql:
                 avatar_store.execute(sqlCmd)
             avatar_store.commit()
 
