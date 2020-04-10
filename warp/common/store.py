@@ -18,7 +18,7 @@ def setup_store(db_uri):
     avatar_store.__init__(database)
 
     # Only sqlite uses this now
-    sql_bundle = _get_creation_sql(avatar_store, db_uri)
+    sql_bundle = get_creation_sql(avatar_store, db_uri)
     if not sql_bundle:
         return database
 
@@ -38,7 +38,7 @@ def setup_store(db_uri):
     return database
 
 
-def _get_creation_sql(store, db_uri):
+def get_creation_sql(store, db_uri):
     conn_type = store._connection.__class__.__name__
     return {
         'SQLiteConnection': {
