@@ -21,6 +21,7 @@ setup(name="warp",
           "Mako >= 0.2.5",
           "pytz",
           "simplejson",
+          "prometheus-client >= 0.7.1"
       ],
 
       package_data={

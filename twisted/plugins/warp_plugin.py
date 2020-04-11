@@ -5,6 +5,11 @@ from twisted.application import internet
 from twisted.plugin import IPlugin
 from twisted.conch import manhole_tap
 
+from twisted.web.server import Site
+from twisted.web.resource import Resource
+
+from prometheus_client.twisted import MetricsResource
+
 from warp.iwarp import IWarpService
 from warp import runtime, command
 
@@ -47,8 +52,15 @@ class WarpServiceMaker(object):
             'sshKeySize': options['sshKeySize'],
         })
 
+
+        metrics_root = Resource()
+        metrics_root.putChild(b'metrics', MetricsResource())
+        metrics_factory = Site(metrics_root)
+        metrics_service = internet.TCPServer(options['metricsPort'], metrics_factory)
+
         warp_service.setServiceParent(svc)
         console_service.setServiceParent(svc)
+        metrics_service.setServiceParent(svc)
 
         # if hasattr(config_module, 'mungeService'):
         #     warp_service = config_module.mungeService(warp_service)
