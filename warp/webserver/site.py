@@ -61,15 +61,15 @@ class WarpSite(Site):
     def _updateLogDateTime(self):
         """
         In superclass, updates log datetime periodically for performance.
-        Now handled at a higher level, e.g. journald.
+        Here does nothing, assuming that it is handled at a higher level, e.g. journald.
         """
         pass
 
     def log(self, request):
         """
-        Log a request's result to the logfile, by default in combined log format.
+        Log the result of a request in combined log format.
         """
-        log.msg("request_headers: %r" % [[k, v] for k, v in request.requestHeaders.getAllRawHeaders()])
+        # log.msg("request_headers: %r" % [[k, v] for k, v in request.requestHeaders.getAllRawHeaders()])
         line = '%s - - %s "%s" %d %s "%s" "%s"\n' % (
             request.getClientIP(),
             # request.getUser() or "-", # the remote user is almost never important
