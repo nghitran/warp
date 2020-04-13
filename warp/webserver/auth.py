@@ -6,14 +6,15 @@ from warp.common.avatar import Avatar
 from warp.runtime import avatar_store, config
 
 
-
 class LoginBase(object):
-
     isLeaf = True
+
+    def doIt(self, request):
+        pass
 
     def render(self, request):
         self.doIt(request)
-        
+
         if request.session.avatar is not None and request.session.afterLogin is not None:
             url = request.session.afterLogin
             request.session.afterLogin = None
@@ -44,11 +45,10 @@ class LoginHandler(LoginBase):
             return False
 
         avatar = avatar_store.find(Avatar,
-                                   Avatar.email == email.decode("utf-8")
-                                   ).one()
+                                   Avatar.email == email.decode("utf-8")).one()
 
         checker = config.get('checkPassword', defaultCheckPassword)
-        
+
         if avatar is None or not checker(avatar, password):
             request.session.addFlashMessage("Login failed: Email or password incorrect",
                                             _domain="_warp:login")
