@@ -2,9 +2,8 @@ import time
 from datetime import datetime
 
 from storm.locals import *
-from warp import runtime
-from warp.common import access
 
+from warp import runtime
 from warp.common.schema import stormSchema
 
 @stormSchema.versioned
@@ -21,14 +20,10 @@ class Avatar(Storm):
         if self._roles is None:
             roleLookup = runtime.config['roles']
             avatar_roles = runtime.avatar_store.find(
-                AvatarRole,
-                AvatarRole.avatar == self
-            ).order_by(AvatarRole.position)
+                AvatarRole, AvatarRole.avatar == self).order_by(AvatarRole.position)
             self._roles = tuple(
-                [roleLookup[ar.role_name]
-                    for ar in avatar_roles if ar.role_name in roleLookup] +
-                [roleLookup[r] for r in
-                    runtime.config['defaultRoles']]
+                [roleLookup[ar.role_name] for ar in avatar_roles if ar.role_name in roleLookup] +
+                [roleLookup[r] for r in runtime.config['defaultRoles']]
             )
 
         return self._roles
@@ -139,10 +134,7 @@ class AvatarRole(Storm):
     __storm_table__ = "warp_avatar_role"
 
     id = Int(primary=True)
-
     avatar_id = Int()
     avatar = Reference(avatar_id, "Avatar.id")
-
     role_name = RawStr()
-
     position = Int()
