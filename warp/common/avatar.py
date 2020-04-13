@@ -1,7 +1,10 @@
 import time
+import random
 from datetime import datetime
 
 from storm.locals import *
+
+from twisted.python.hashlib import md5
 
 from warp import runtime
 from warp.common.schema import stormSchema
@@ -43,7 +46,6 @@ class SessionManager(object):
     """
     Default DB-backed session handling
     """
-
     counter = 0
 
     def createSession(self):
@@ -58,8 +60,6 @@ class SessionManager(object):
         return runtime.avatar_store.get(DBSession, uid)
 
     def _mkuid(self):
-        from twisted.python.hashlib import md5
-        import random
         self.counter = self.counter + 1
         return md5("%s_%s" % (str(random.random()), str(self.counter))).hexdigest()
 
@@ -107,12 +107,12 @@ class DBSession(Storm):
     def hasAvatar(self):
         return self.avatar_id is not None
 
-    def setPersistent(self, isPersistent):
-        self.isPersistent = isPersistent
+    def setPersistent(self, is_persistent):
+        self.isPersistent = is_persistent
         runtime.avatar_store.commit()
 
-    def setAvatarID(self, avatarID):
-        self.avatar_id = avatarID
+    def setAvatarID(self, avatar_id):
+        self.avatar_id = avatar_id
         runtime.avatar_store.commit()
 
     def age(self):
