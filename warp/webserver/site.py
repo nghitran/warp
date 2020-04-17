@@ -38,9 +38,18 @@ class WarpSite(Site):
     sessionManager = SessionManager()
 
     def makeSession(self):
+        """
+        Create new session.
+        """
         return self.sessionManager.createSession()
 
     def getSession(self, uid):
+        """
+        Get session matching unique id.
+
+        @type  uid: string
+        @param uid: Unique id for session.
+        """
         session = self.sessionManager.getSession(uid)
 
         if session is None:
