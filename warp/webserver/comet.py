@@ -15,19 +15,16 @@ POLL_TIMEOUT = 10
 
 
 class CometSession(object):
-
     def __init__(self, sid):
         self.id = sid
         self.buffer = []
         self.listener = None
         self.pollTimeout = None
-        
-        self.sessionTimeout = reactor.callLater(
-            SESSION_TIMEOUT, self.cbSessionTimeout)
 
+        self.sessionTimeout = reactor.callLater(SESSION_TIMEOUT,
+                                                self.cbSessionTimeout)
 
     def addListener(self, request):
-
         self.sessionTimeout.reset(SESSION_TIMEOUT)
 
         if self.buffer:
@@ -40,29 +37,24 @@ class CometSession(object):
             self._flushWith([])
 
         self.listener = request
-        self.pollTimeout = reactor.callLater(
-            POLL_TIMEOUT, self.cbPollTimeout)
+        self.pollTimeout = reactor.callLater(POLL_TIMEOUT, self.cbPollTimeout)
 
         request.notifyFinish().addBoth(self._listenerDied)
 
         return NOT_DONE_YET
 
-            
     def push(self, obj):
         if self.listener is not None:
             self._flushWith([obj])
         else:
             self.buffer.append(obj)
 
-
     def cbSessionTimeout(self):
         print "Comet session expired:", self.id
         del sessions[self.id]
-        
 
     def cbPollTimeout(self):
         self._flushWith([])
-
 
     def _listenerDied(self, _):
         try:
@@ -72,13 +64,10 @@ class CometSession(object):
 
         self.listener = None
 
-
     def _flushWith(self, stuff):
         msg = json.dumps(stuff)
         self.listener.write(msg)
         self.listener.finish()
-
-
 
 
 def get_session(request, createIfMissing=False):
@@ -91,16 +80,11 @@ def get_session(request, createIfMissing=False):
             sessions[sid] = session
             return session
 
-
-
 def render_id(request):
     return str(uuid.uuid4())
 
-
-
 def render_longpoll(request):
     return get_session(request, True).addListener(request)
-    
 
 def render_testpush(request):
     session = get_session(request, True)
