@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import textwrap
 
 from twisted.python import reflect
@@ -8,13 +10,11 @@ from warp.tools import skeleton
 
 
 def autocrud(nodes, name, modelFQN):
-
     model = reflect.namedObject(modelFQN)
-
     schema = [a for a in dir(model) if isinstance(getattr(model, a), PropertyColumn)]
 
     if 'id' not in schema:
-        print "Sorry, this code isn't clever enough to auto-crud models with no id"
+        print("Sorry, this code isn't clever enough to auto-crud models with no id")
         return
 
     listCols = ["id"]
@@ -27,7 +27,7 @@ def autocrud(nodes, name, modelFQN):
     if 'name' in crudCols:
         crudCols.remove('name')
         crudCols.insert(0, 'name')
-        
+
     listColumns = ", ".join('"%s"' % c for c in listCols)
     crudColumns = textwrap.fill(", ".join('"%s"' % c for c in crudCols))
 
@@ -39,8 +39,6 @@ def autocrud(nodes, name, modelFQN):
     }
 
     skeleton.createNode(nodes, name, createIndex=False, nodeContent=nodeContent)
-    
-
 
 
 crudTemplate = """
@@ -63,10 +61,9 @@ class Crud%(model)s(CrudModel):
     }
 
     def render_list_name(self, request):
-        return link(
-            self.name(request),
-            getNode("%(node)s"), 
-            "view", [self.obj.id])
+        return link(self.name(request),
+                    getNode("%(node)s"),
+                    "view", [self.obj.id])
 
     def name(self, request):
         return self.obj.name
@@ -78,6 +75,3 @@ expose(%(model)s, Crud%(model)s)
 
 renderer = render.CrudRenderer(%(model)s)
 """
-
-
-    
