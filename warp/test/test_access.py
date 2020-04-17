@@ -12,24 +12,24 @@ class AccessTest(unittest.TestCase):
         obj = object()
         self.assertEqual(a.Equals(obj).allows(obj), True)
         self.assertEqual(a.Equals(obj).allows(object()), False)
-        
+
     def testCallback(self):
         self.assertEqual(a.Callback(lambda _: True).allows(object()), True)
         self.assertEqual(a.Callback(lambda _: False).allows(object()), False)
 
     def testCombiners(self):
         self.assertEqual(a.All(a.Allow(), a.Allow()).allows(object()), True)
-        self.assertEqual(a.All(a.Allow(), a.Deny()).allows(object()), False)       
+        self.assertEqual(a.All(a.Allow(), a.Deny()).allows(object()), False)
         self.assertEqual(a.Any(a.Deny(), a.Allow()).allows(object()), True)
         self.assertEqual(a.Any(a.Deny(), a.Deny()).allows(object()), False)
-        
+
     def testEmptyRole(self):
         self.assertEqual(a.Role({}).allows(object()), None)
 
     def testEmptyRuleList(self):
         obj = object()
         self.assertEqual(a.Role({obj: []}).allows(obj), None)
-        
+
     def testRoleAllows(self):
         obj = object()
         self.assertEqual(a.Role({obj: [a.Allow()]}).allows(obj), True)
