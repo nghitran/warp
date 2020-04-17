@@ -14,7 +14,7 @@ INSERT_SQL = "INSERT INTO warp_fulltext (model, doc_id, fulltext) VALUES (?::tex
 
 SEARCH_SQL = """
 SELECT model, doc_id
-FROM warp_fulltext, 
+FROM warp_fulltext,
      plainto_tsquery(?::text::regconfig, ?::text) AS query
 WHERE fulltext @@ query
 ORDER BY ts_rank_cd(fulltext, query) DESC
@@ -30,10 +30,9 @@ class SearchMeta(Storm.__metaclass__):
             searchModels[self.__name__] = self
 
         return super(SearchMeta, self).__init__(name, bases, dict)
-    
+
 
 class Searchable(Storm):
-
     __metaclass__ = SearchMeta
 
     _searchSeparator = u' $$ '
@@ -48,12 +47,10 @@ class Searchable(Storm):
         avatar_store.execute(DELETE_SQL, (self.__class__.__name__, self.id))
 
         if get_obj_info(self).get("store") is not None:
-            
             vals = [v for v in self.getSearchVals() if v is not None]
 
             if vals:
                 text = self._searchSeparator.join(vals).encode("utf-8")
-
                 avatar_store.execute(INSERT_SQL,
                                      (self.__class__.__name__,
                                       self.id,
@@ -63,7 +60,6 @@ class Searchable(Storm):
 
 
 def reindex():
-    import storm.database
     avatar_store.execute("DELETE FROM warp_fulltext")
     for klass in searchModels.itervalues():
         for obj in avatar_store.find(klass):
@@ -71,6 +67,6 @@ def reindex():
 
 
 def search(term, language='english'):
-    for modelName, doc_id in avatar_store.execute(SEARCH_SQL, (language, term.encode("utf-8"))):
-        model = searchModels[modelName]
+    for model_name, doc_id in avatar_store.execute(SEARCH_SQL, (language, term.encode("utf-8"))):
+        model = searchModels[model_name]
         yield avatar_store.get(model, doc_id)
