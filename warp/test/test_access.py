@@ -4,41 +4,41 @@ from warp.common import access as a
 
 class AccessTest(unittest.TestCase):
 
-    def testAllowDeny(self):
+    def test_allow_deny(self):
         self.assertEqual(a.Allow().allows(object()), True)
         self.assertEqual(a.Deny().allows(object()), False)
 
-    def testEquals(self):
+    def test_equals(self):
         obj = object()
         self.assertEqual(a.Equals(obj).allows(obj), True)
         self.assertEqual(a.Equals(obj).allows(object()), False)
 
-    def testCallback(self):
+    def test_callback(self):
         self.assertEqual(a.Callback(lambda _: True).allows(object()), True)
         self.assertEqual(a.Callback(lambda _: False).allows(object()), False)
 
-    def testCombiners(self):
+    def test_combiners(self):
         self.assertEqual(a.All(a.Allow(), a.Allow()).allows(object()), True)
         self.assertEqual(a.All(a.Allow(), a.Deny()).allows(object()), False)
         self.assertEqual(a.Any(a.Deny(), a.Allow()).allows(object()), True)
         self.assertEqual(a.Any(a.Deny(), a.Deny()).allows(object()), False)
 
-    def testEmptyRole(self):
+    def test_empty_role(self):
         self.assertEqual(a.Role({}).allows(object()), None)
 
-    def testEmptyRuleList(self):
+    def test_empty_rule_list(self):
         obj = object()
         self.assertEqual(a.Role({obj: []}).allows(obj), None)
 
-    def testRoleAllows(self):
+    def test_role_allows(self):
         obj = object()
         self.assertEqual(a.Role({obj: [a.Allow()]}).allows(obj), True)
 
-    def testRoleDenies(self):
+    def test_role_denies(self):
         obj = object()
         self.assertEqual(a.Role({obj: [a.Deny()]}).allows(obj), False)
 
-    def testRoleDefaults(self):
+    def test_role_defaults(self):
         self.assertEqual(a.Role({}, default=[a.Allow()]).allows(object()), True)
         self.assertEqual(a.Role({}, default=[a.Deny()]).allows(object()), False)
         self.assertEqual(a.Role({}, default=[]).allows(object()), None)
