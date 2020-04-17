@@ -44,12 +44,17 @@ def nowstamp():
 
 class SessionManager(object):
     """
-    Default DB-backed session handling
+    Handle sessions using database.
     """
     counter = 0
 
     def createSession(self):
-        uid = self._mkuid()
+        """
+        Create initial session.
+
+        @return:  Session object
+        """
+        uid = self._create_uid()
         session = DBSession()
         session.uid = uid
         runtime.avatar_store.add(session)
@@ -57,11 +62,26 @@ class SessionManager(object):
         return session
 
     def getSession(self, uid):
+        """
+        Get session matching uid.
+
+        @type  uid: string
+        @param uid: Unique id for session.
+
+        @return:  Session object
+        """
         return runtime.avatar_store.get(DBSession, uid)
 
-    def _mkuid(self):
+    def _create_uid(self):
+        """
+        Create uid.
+        """
         self.counter = self.counter + 1
         return md5("%s_%s" % (str(random.random()), str(self.counter))).hexdigest()
+
+class Session(object):
+    pass
+
 
 
 @stormSchema.versioned
@@ -91,12 +111,25 @@ class DBSession(Storm):
             self.touched = nowstamp()
             runtime.avatar_store.commit()
 
+
     def addFlashMessage(self, msg, *args, **kwargs):
+        """
+        Add flash message to session.
+
+        These are messages which should be displayed to the user for a single
+        page load, e.g. to indicate that an action has succeeded.
+        """
         if self.uid not in _MESSAGES:
             _MESSAGES[self.uid] = []
         _MESSAGES[self.uid].append((msg, args, kwargs))
 
     def getFlashMessages(self, clear=True):
+        """
+        Get flash messages for session.
+
+        @type  clear: C{boolean}
+        @param clear: Whether to clear messages after reading, default True
+        """
         if self.uid not in _MESSAGES:
             return []
         messages = _MESSAGES[self.uid][:]
@@ -104,15 +137,17 @@ class DBSession(Storm):
             del _MESSAGES[self.uid]
         return messages
 
+
     def hasAvatar(self):
         return self.avatar_id is not None
 
-    def setPersistent(self, is_persistent):
-        self.isPersistent = is_persistent
-        runtime.avatar_store.commit()
-
     def setAvatarID(self, avatar_id):
         self.avatar_id = avatar_id
+        runtime.avatar_store.commit()
+
+
+    def setPersistent(self, is_persistent):
+        self.isPersistent = is_persistent
         runtime.avatar_store.commit()
 
     def age(self):
