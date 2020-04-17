@@ -1,3 +1,6 @@
+"""
+Handle user authentication
+"""
 from zope.interface import implements
 
 from twisted.web.resource import IResource
@@ -33,6 +36,13 @@ class LoginHandler(LoginBase):
     implements(IResource)
 
     def doIt(self, request):
+        """
+        Attempt to authenticate the user.
+
+        Returns False if there was a problem, True otherwise.
+
+        On success, sets avatar in request.session and request.avatar
+        """
         if request.method != 'POST':
             return False
 
