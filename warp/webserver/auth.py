@@ -13,6 +13,9 @@ class LoginBase(object):
     isLeaf = True
 
     def doIt(self, request):
+        """
+        @rtype: C{bool}
+        """
         pass
 
     def render(self, request):
@@ -38,6 +41,8 @@ class LoginHandler(LoginBase):
     def doIt(self, request):
         """
         Attempt to authenticate the user.
+
+        @rtype: C{bool}
 
         Returns False if there was a problem, True otherwise.
 
