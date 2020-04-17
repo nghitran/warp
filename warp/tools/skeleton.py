@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 
 from twisted.python.filepath import FilePath
@@ -16,21 +17,21 @@ def createSkeleton(siteDir):
         if destination.exists():
             continue
 
-        print "  Copying %s" % entryName
+        print("  Copying %s" % entryName)
 
         if not destination.parent().exists():
             destination.parent().makedirs()
 
         entry.copyTo(destination)
 
-    print "Done! Run with 'twistd -n warp'"
+    print("Done! Run with 'twistd -n warp'")
 
 
 def createNode(nodes, name, createIndex=True, nodeContent=""):
 
     segments = name.split('/')
     root = nodes
-    
+
     for i, segment in enumerate(segments[:-1]):
 
         node = root.child(segment)
@@ -43,7 +44,7 @@ def render_index(request):
   return "Redirecting..."
 """ % segments[i+1])
 
-            print "Node '%s' created" % '/'.join(segments[:i+1])
+            print("Node '%s' created" % '/'.join(segments[:i+1]))
 
         root = node
 
@@ -61,4 +62,4 @@ def render_index(request):
 This is the index page for node '%s'.
 """ % nodeName)
 
-    print "Node '%s' created" % name
+    print("Node '%s' created" % name)
