@@ -1,3 +1,4 @@
+from __future__ import print_function
 from warp.runtime import sql, store
 
 tableSpecs = [
@@ -12,6 +13,6 @@ tableSpecs = [
 def setup():
     for (table, creationSQL) in tableSpecs:
         if not sql['tableExists'](store, table):
-            print "Creating table %s" % table
+            print("Creating table %s" % table)
             store.execute(creationSQL)
             store.commit()
