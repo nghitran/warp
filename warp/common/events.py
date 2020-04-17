@@ -1,9 +1,11 @@
+from __future__ import print_function
 import traceback
 from collections import defaultdict
 
 from storm.locals import Store, Storm
 from storm.info import get_obj_info
 
+from twisted.python import log
 
 handlers = defaultdict(list)
 
@@ -21,9 +23,7 @@ def handler(event, *models):
     return decorate
 
 
-
 class CommitEventStore(Store):
-
     def __init__(self, database, cache=None):
         self.events = []
         super(CommitEventStore, self).__init__(database, cache)
@@ -45,16 +45,13 @@ class CommitEventStore(Store):
                 event.run()
 
 
-                
 class EventModel(Storm):
-    
     def emit(self, event, **kwargs):
         store = get_obj_info(self)["store"]
         if store is None:
             raise Exception("Tried to emit event for store-less object")
 
         store.events.append(PendingEvent(self, event, kwargs))
-
 
 
 class PendingEvent(object):
@@ -65,12 +62,11 @@ class PendingEvent(object):
 
     def run(self):
         modelName = self.obj.__class__.__name__
-        eventHandlers = (set(handlers.get((modelName, self.event), [])) 
+        eventHandlers = (set(handlers.get((modelName, self.event), []))
                          | set(handlers.get((None, self.event), [])))
 
         for handler in eventHandlers:
             try:
                 handler(self.obj, **self.kwargs)
             except Exception:
-                print ">>> Error in event handler"
-                traceback.print_exc()
+                log.err()
