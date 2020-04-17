@@ -5,9 +5,13 @@ from datetime import datetime
 from storm.locals import *
 
 from twisted.python.hashlib import md5
+from twisted.python import components
 
 from warp import runtime
 from warp.common.schema import stormSchema
+
+# Default session lang
+DEFAULT_LANG = u'en_US'
 
 @stormSchema.versioned
 class Avatar(Storm):
@@ -36,11 +40,161 @@ class Avatar(Storm):
         return "<Avatar '%s'>" % self.email.encode("utf-8")
 
 
+# Store flash messages
 _MESSAGES = {}
 
 def nowstamp():
     return int(time.mktime(datetime.utcnow().timetuple()))
 
+class Session(components.Componentized):
+    """
+    Base interface for session.
+
+    @ivar uid: A unique identifier for the session, C{bytes}.
+    @ivar language: ISO locale code
+    @ivar isPersistent: Whether session is persistent, i.e. not subject to session timeout
+    @ivar touched: Last time when session was used
+
+    @ivar avatar_id: Avatar id
+    @ivar avatar: Avatar object instance
+
+    @ivar afterLogin: URL to redirect to after login
+
+    This implements functions and properties from C{twisted.web.server.Session},
+    and C{DBSession}. It doesn't implement session timeouts or require a database.
+    """
+    sessionTimeout = 900
+
+    isPersistent = False
+    language = DEFAULT_LANG
+
+    # Don't update session age if it is less than this
+    # _touch_granularity = 10
+
+    # Class variable which stores flash messages
+    _MESSAGES = {}
+
+    def __init__(self, uid):
+        """
+        Initialize a session with a unique ID for that session.
+        """
+        components.Componentized.__init__(self)
+
+        self.uid = uid
+        self.touch()
+
+        self.avatar_id = None
+        self.avatar = None
+
+        self.afterLogin = None
+
+    def addFlashMessage(self, msg, *args, **kwargs):
+        """
+        Add flash message to session.
+
+        These are messages which should be displayed to the user for a single
+        page load, e.g. to indicate that an action has succeeded.
+        """
+        if self.uid not in self._MESSAGES:
+            self._MESSAGES[self.uid] = []
+        self._MESSAGES[self.uid].append((msg, args, kwargs))
+
+    def getFlashMessages(self, clear=True):
+        """
+        Get flash messages for session.
+
+        @param clear: Whether to clear messages after reading, default True
+        @type  clear: C{bool}
+        """
+        if self.uid not in self._MESSAGES:
+            return []
+        messages = self._MESSAGES[self.uid][:]
+        if clear:
+            del self._MESSAGES[self.uid]
+        return messages
+
+
+    def hasAvatar(self):
+        return self.avatar_id is not None
+
+    def setAvatarID(self, avatar_id):
+        """
+        Set avatar_id for session.
+
+        Set to None when session is no longer valid.
+
+        @param avatar_id: Integer id of avatar.
+        @type avatar_id: C{integer}
+        """
+        self.avatar_id = avatar_id
+
+
+    def setPersistent(self, is_persistent):
+        """
+        @param is_persistent: Set whether session is persistent.
+        @type is_peristent: C{bool}
+        """
+        self.isPersistent = is_persistent
+
+
+    def age(self):
+        """
+        @return Time since session was used in seconds.
+        @rtype C{integer}
+        """
+        return nowstamp() - self.touched
+
+    def touch(self):
+        """
+        Indicate that the session has been used.
+
+        This is used to extend the session inactivity timeout.
+        """
+        self.touched = nowstamp()
+        # Optimization to prevent multiple updates in a short period of time
+        # if self.age() > self._touch_granularity:
+        #     self.touched = nowstamp()
+
+    def __repr__(self):
+        return "<Session '%s'>" % self.uid
+
+
+class SessionManagerBase(object):
+    """
+    Base interface for SessionManager implementations.
+    """
+    counter = 0
+    sessions = {}
+
+    def createSession(self):
+        """
+        Generate a new Session instance.
+
+        @return:  Session object
+        """
+        uid = self._create_uid()
+        session = self.sessions[uid] = Session(uid)
+        return session
+
+    def getSession(self, uid):
+        """
+        Get a previously generated session by its unique ID.
+
+        This raises a KeyError if the session is not found.
+
+        @type  uid: string
+        @param uid: Unique id for session.
+
+        @return:  Session object
+        """
+        return self.sessions[uid]
+
+    def _create_uid(self):
+        """
+        Create uid.
+        """
+        self.counter = self.counter + 1
+        return md5("%s_%s" % (str(random.random()), str(self.counter))).hexdigest()
 
 class SessionManager(object):
     """
@@ -78,10 +232,6 @@ class SessionManager(object):
         """
         self.counter = self.counter + 1
         return md5("%s_%s" % (str(random.random()), str(self.counter))).hexdigest()
-
-class Session(object):
-    pass
-
 
 
 @stormSchema.versioned
