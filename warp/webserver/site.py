@@ -61,7 +61,7 @@ class WarpSite(Site):
             max_age = config.get("sessionMaxAge")
             if max_age is not None and session.age() > max_age:
                 session.addFlashMessage("You were logged out due to inactivity",
-                                        _domain="_warp:login")
+                                        _domain='_warp:login')
                 session.setAvatarID(None)
 
         return session
