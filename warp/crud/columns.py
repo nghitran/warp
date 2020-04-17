@@ -12,9 +12,8 @@ def utcnow():
 
 class UTCDateTime(DateTime):
     def __init__(self):
-        super(UTCDateTime, self).__init__(
-            tzinfo=pytz.UTC, 
-            default_factory = utcnow)
+        super(UTCDateTime, self).__init__(tzinfo=pytz.UTC,
+                                          default_factory=utcnow)
 
 
 class NonEmptyUnicode(Unicode):
@@ -35,7 +34,6 @@ class HTML(Unicode):
     Render edit boxes as a big HTML text area instead of a one-line input
     """
     pass
-
 
 
 class Image(RawStr):
