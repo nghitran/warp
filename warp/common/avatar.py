@@ -51,22 +51,21 @@ class Session(components.Componentized):
     Base interface for session.
 
     @ivar uid: A unique identifier for the session, C{bytes}.
-    @ivar language: ISO locale code
     @ivar isPersistent: Whether session is persistent, i.e. not subject to session timeout
     @ivar touched: Last time when session was used
+
+    @ivar language: ISO locale code
 
     @ivar avatar_id: Avatar id
     @ivar avatar: Avatar object instance
 
-    @ivar afterLogin: URL to redirect to after login
-
-    This implements functions and properties from C{twisted.web.server.Session},
+    This implements methods and properties from C{twisted.web.server.Session},
     and C{DBSession}. It doesn't implement session timeouts or require a database.
     """
-    sessionTimeout = 900
-
-    isPersistent = False
     language = DEFAULT_LANG
+    isPersistent = False
+
+    # sessionTimeout = 900
 
     # Don't update session age if it is less than this
     # _touch_granularity = 10
@@ -76,7 +75,7 @@ class Session(components.Componentized):
 
     def __init__(self, uid):
         """
-        Initialize a session with a unique ID for that session.
+        Initialize a session with a unique ID.
         """
         components.Componentized.__init__(self)
 
@@ -85,8 +84,6 @@ class Session(components.Componentized):
 
         self.avatar_id = None
         self.avatar = None
-
-        self.afterLogin = None
 
     def addFlashMessage(self, msg, *args, **kwargs):
         """
