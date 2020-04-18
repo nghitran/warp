@@ -35,7 +35,7 @@ class WarpResourceWrapper(object):
             config['siteDir'].child('templates').path,
             self.warpTemplatePath.path,
             config['siteDir'].child('nodes').path
-        ], output_encoding="utf-8")
+        ], output_encoding='utf-8')
 
         # Configure special URLs to point to handlers which can may be
         # overridden by app
@@ -179,13 +179,13 @@ class AccessDenied(object):
     implements(IResource)
 
     isLeaf = True
-    facetName = "view"
+    facetName = 'view'
     args = ()
 
     def render(self, request):
         request.node = None
         request.resource = self
-        template = templateLookup.get_template("/accessdenied.mak")
+        template = templateLookup.get_template('/accessdenied.mak')
         return helpers.renderTemplateObj(request, template)
 
 
@@ -255,8 +255,8 @@ class NodeResource(object):
             return "Redirecting..."
 
         # Should be configurable somehow
-        request.setHeader("Pragma", "no-cache")
-        request.setHeader("Expires", "-1")
+        request.setHeader(b'Pragma', b'no-cache')
+        request.setHeader(b'Expires', '-1')
 
         return self.response
 
@@ -278,7 +278,7 @@ class NodeResource(object):
         return None
 
     def getTemplate(self, facet_name):
-        template_path = FilePath(self.node.__file__).sibling(facet_name + ".mak")
+        template_path = FilePath(self.node.__file__).sibling(facet_name + '.mak')
         if template_path.exists():
             return template_path
 
