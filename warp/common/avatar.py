@@ -169,7 +169,7 @@ class SessionManagerBase(object):
 
         @return:  Session object
         """
-        uid = self._create_uid()
+        uid = self._mkuid()
         session = self.sessions[uid] = Session(uid)
         return session
 
@@ -186,7 +186,7 @@ class SessionManagerBase(object):
         """
         return self.sessions[uid]
 
-    def _create_uid(self):
+    def _mkuid(self):
         """
         Create uid.
         """
