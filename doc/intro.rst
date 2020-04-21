@@ -21,5 +21,4 @@ Warp is currently being developed by `Cogini`_, but it's `open source
 It was originally written by Brendon Hogger for Cogini.
 
 .. _Cogini: http://www.cogini.com
-.. _Freenode: http://freenode.net/
 .. _Brendon Hogger: http://www.linkedin.com/in/exbrend

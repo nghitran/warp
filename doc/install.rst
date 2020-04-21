@@ -4,7 +4,8 @@ Installation
 Debian / Ubuntu
 ---------------
 
-Either download the latest Warp release from PyPI_ and install it in the normal way, or run the following:
+Either download the latest Warp release from PyPI_ and install it in the normal
+way, or run the following:
 
 .. _PyPI: http://pypi.python.org/pypi/warp
 
@@ -25,7 +26,9 @@ Install Python_, MinGW_, and Twisted_.
 .. _MinGW: http://www.mingw.org/wiki/HOWTO_Install_the_MinGW_GCC_Compiler_Suite
 .. _Twisted: http://twistedmatrix.com/trac/wiki/Downloads
 
-Add the MinGW path, the Python executable path, and the Python scripts path to your PATH environment variable (``Control Panel -> System -> Advanced -> Environment Variables``). Usually these are:
+Add the MinGW path, the Python executable path, and the Python scripts path to
+your PATH environment variable (``Control Panel -> System -> Advanced -> Environment Variables``).
+Usually these are:
 
 ::
 
@@ -33,7 +36,8 @@ Add the MinGW path, the Python executable path, and the Python scripts path to y
   c:\Python26
   c:\Python26\scripts
 
-Tell Python to use MinGW to build extension modules, by writing a file like ``c:\Python26\Lib\distutils\distutils.cfg`` containing:
+Tell Python to use MinGW to build extension modules, by writing a file like
+``c:\Python26\Lib\distutils\distutils.cfg`` containing:
 
 ::
 
