@@ -7,17 +7,17 @@ import warp
 
 
 def createSkeleton(siteDir):
-    fromDir = FilePath(warp.__file__).sibling("priv").child("skeleton")
+    from_dir = FilePath(warp.__file__).sibling('priv').child('skeleton')
 
-    for entryName in (l.strip() for l in fromDir.child("MANIFEST").open()):
-        entry = fromDir.preauthChild(entryName)
+    for entry_name in (l.strip() for l in from_dir.child("MANIFEST").open()):
+        entry = from_dir.preauthChild(entry_name)
 
-        destination = siteDir.preauthChild(entryName)
+        destination = siteDir.preauthChild(entry_name)
 
         if destination.exists():
             continue
 
-        print("  Copying %s" % entryName)
+        print("  Copying %s" % entry_name)
 
         if not destination.parent().exists():
             destination.parent().makedirs()
