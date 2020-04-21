@@ -76,6 +76,9 @@ class LoginHandler(LoginBase):
 
 
 class LogoutHandler(LoginBase):
+    """
+    Log out user.
+    """
 
     def doIt(self, request):
         request.session.setAvatarID(None)
