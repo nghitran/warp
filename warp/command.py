@@ -167,7 +167,7 @@ def skeleton(options):
     """
     Copy Warp site skeleton into current directory
     """
-    print('Creating skeleton...')
+    print("Creating skeleton...")
     site_dir = getSiteDir(options)
     skeleton.createSkeleton(site_dir)
 
