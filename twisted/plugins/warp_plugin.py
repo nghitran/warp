@@ -15,7 +15,7 @@ from warp import runtime, command
 
 class WarpServiceMaker(object):
     implements(IServiceMaker, IPlugin, IWarpService)
-    tapname = "warp"
+    tapname = 'warp'
     description = "Warp webserver"
     options = command.Options
 
@@ -44,9 +44,9 @@ class WarpServiceMaker(object):
         console_service = manhole_tap.makeService({
             'telnetPort': options['telnetPort'],
             'sshPort': options['sshPort'],
-            # 'sshPort': "tcp:%s:interface=127.0.0.1" % port,
+            # 'sshPort': 'tcp:%s:interface=127.0.0.1' % port,
             'namespace': {'service': warp_service, 'store': runtime.store},
-            'passwd': options['consolePasswd'] or console_config.get("passwd_file"),
+            'passwd': options['consolePasswd'] or console_config.get('passwd_file'),
             'sshKeyDir': options['sshKeyDir'],
             'sshKeyName': options['sshKeyName'],
             'sshKeySize': options['sshKeySize'],
