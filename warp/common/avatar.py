@@ -205,7 +205,7 @@ class SessionManager(object):
 
         @return:  Session object
         """
-        uid = self._create_uid()
+        uid = self._mkuid()
         session = DBSession()
         session.uid = uid
         runtime.avatar_store.add(session)
@@ -223,7 +223,7 @@ class SessionManager(object):
         """
         return runtime.avatar_store.get(DBSession, uid)
 
-    def _create_uid(self):
+    def _mkuid(self):
         """
         Create uid.
         """
