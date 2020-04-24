@@ -61,15 +61,17 @@ class WarpResourceWrapper(object):
 
         # Init for everything except static files
         session = request.getSession()
-        request.avatar = session.avatar
 
-        get_request_store = config.get('getRequestStore')
-        if get_request_store is not None:
-            request.store = get_request_store(request)
-        else:
-            request.store = avatar_store
+        if request.store is not None:
+            get_request_store = config.get('getRequestStore')
+            if get_request_store is not None:
+                request.store = get_request_store(request)
+            else:
+                request.store = avatar_store
 
         if request.avatar is not None:
+            request.avatar = session.avatar
+
             get_user = config.get('getRequestUser')
             if get_user is not None:
                 request.avatar.user = get_user(request)
@@ -84,7 +86,8 @@ class WarpResourceWrapper(object):
         if config.get('reloadMessages'):
             translate.loadMessages()
 
-        request.translateTerm = translate.getTranslator(session.language)
+        lang = getattr(session, 'language', None) or getattr(session, 'lang', None)
+        request.translateTerm = translate.getTranslator(lang)
 
         segment = first_segment
         if self.caseInsensitiveUrl:
