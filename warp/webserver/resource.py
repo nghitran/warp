@@ -47,6 +47,8 @@ class WarpResourceWrapper(object):
         }
 
         self.caseInsensitiveUrl = False
+        self.store = None
+        self.avatar = None
 
     def getChildWithDefault(self, first_segment, request):
         """
@@ -62,14 +64,14 @@ class WarpResourceWrapper(object):
         # Init for everything except static files
         session = request.getSession()
 
-        if request.store is not None:
+        if request.store is None:
             get_request_store = config.get('getRequestStore')
             if get_request_store is not None:
                 request.store = get_request_store(request)
             else:
                 request.store = avatar_store
 
-        if request.avatar is not None:
+        if request.avatar is None:
             request.avatar = session.avatar
 
             get_user = config.get('getRequestUser')
