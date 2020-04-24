@@ -74,16 +74,10 @@ class WarpResourceWrapper(object):
         if request.avatar is None:
             request.avatar = session.avatar
 
+        if request.avatar is not None:
             get_user = config.get('getRequestUser')
             if get_user is not None:
                 request.avatar.user = get_user(request)
-            else:
-                # Backward compatibility
-                get_user = config.get('getAppUser')
-                if get_user is not None:
-                    warnings.warn("getAppUser is deprecated, use getRequestUser instead",
-                                  DeprecationWarning)
-                    request.avatar.user = get_user(request.avatar)
 
         if config.get('reloadMessages'):
             translate.loadMessages()
