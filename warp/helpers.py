@@ -5,7 +5,6 @@ import urllib2
 from mako.template import Template
 
 from twisted.python import util, filepath
-import warp.log as log
 
 from warp.runtime import templateLookup, config, exposedStormClasses
 
@@ -66,7 +65,7 @@ def renderTemplate(request, template_path, **kw):
     return renderTemplateObj(request, template, **kw)
 
 def renderTemplateObj(request, template, **kw):
-    if kw.pop("return_unicode", False):
+    if kw.pop('return_unicode', False):
         render_func = template.render_unicode
     else:
         render_func = template.render
