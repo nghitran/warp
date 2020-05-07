@@ -89,7 +89,7 @@ def nodeSegments(node):
     nodeDir = filepath.FilePath(node.__file__).parent()
     return nodeDir.segmentsFrom(config['siteDir'].child("nodes"))
 
-def url(node, facet="index", args=(), query=()):
+def url(node, facet='index', args=(), query=()):
     segments = nodeSegments(node)
     segments.append(facet)
     segments.extend(args)
