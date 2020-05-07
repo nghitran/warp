@@ -50,11 +50,13 @@ class Session(components.Componentized):
     """
     Base interface for session.
 
-    @ivar uid: A unique identifier for the session, C{bytes}.
-    @ivar isPersistent: Whether session is persistent, i.e. not subject to session timeout
-    @ivar touched: Last time when session was used
+    @ivar uid: A unique identifier for the session (GUID), C{bytes}
 
-    @ivar language: ISO locale code
+    @ivar isPersistent: Whether session is persistent, i.e. not subject to
+        session inactivity timeout, C{bool}
+    @ivar touched: Time when session was last used, seconds since epoch, C{integer}
+
+    @ivar language: ISO locale code, e.g. en_US, C{bytes}
 
     @ivar avatar_id: Avatar id
     @ivar avatar: Avatar object instance
@@ -76,6 +78,9 @@ class Session(components.Componentized):
     def __init__(self, uid):
         """
         Initialize a session with a unique ID.
+
+        @param uid: Unique identifier for session, GUID.
+        @type  uid: C{bytes}
         """
         components.Componentized.__init__(self)
 
