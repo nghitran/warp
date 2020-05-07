@@ -109,7 +109,6 @@ def doStartup(options):
     """
     Execute startup function
     """
-
     translate.loadMessages()
 
     # Run app custom startup function or default
