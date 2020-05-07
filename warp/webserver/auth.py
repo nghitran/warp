@@ -51,8 +51,8 @@ class LoginHandler(LoginBase):
         if request.method != 'POST':
             return False
 
-        [email] = request.args.get('email', [None])
-        [password] = request.args.get('password', [None])
+        [email] = request.args.get(b'email', [None])
+        [password] = request.args.get(b'password', [None])
 
         if not (email and password):
             request.session.addFlashMessage("Login failed: Email or password not given",
@@ -82,3 +82,5 @@ class LogoutHandler(LoginBase):
 
     def doIt(self, request):
         request.session.setAvatarID(None)
+        # TODO: probably also
+        # request.avatar = None
