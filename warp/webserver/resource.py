@@ -11,6 +11,7 @@ from warp import helpers
 from warp.common import access, translate
 from warp.runtime import avatar_store, pool, config, templateLookup
 from warp.webserver import auth, comet
+import warp.log as log
 
 if '.ico' not in static.File.contentTypes:
     static.File.contentTypes['.ico'] = 'image/vnd.microsoft.icon'
@@ -52,6 +53,7 @@ class WarpResourceWrapper(object):
         """
         Return a child with the given name for the given request.
         """
+        # log.msg("first_segment: %r %r" % (first_segment, request))
         # Serve request for static file
         if first_segment:
             fp = self.buildFilePath(request)
@@ -87,12 +89,16 @@ class WarpResourceWrapper(object):
         if self.caseInsensitiveUrl:
             segment = first_segment.lower()
 
+        # log.msg("segment: %r" % segment)
+
         handler = self.dispatch.get(segment)
         if handler:
+            # log.msg("handler: %r" % handler)
             return handler(request)
 
         node = helpers.getNode(first_segment)
         if node:
+            # log.msg("node: %r" % node)
             return NodeResource(node)
 
         return NoResource()
