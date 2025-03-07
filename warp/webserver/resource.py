@@ -1,8 +1,6 @@
 """
 Resource customizations
 """
-import warnings
-
 from zope.interface import implements
 
 from twisted.python.filepath import FilePath, InsecurePath
