@@ -40,7 +40,7 @@ def getNode(name):
     try:
         return getattr(__import__("nodes.%s" % ".".join(bits),
                                   fromlist=[leaf]), leaf, None)
-    except ImportError, ie:
+    except ImportError as ie:
         log.err("getNode(%s): ImportError: %s %r" % (name, ie, dict(ie.__dict__)))
         # Hrgh
         if ie.message.startswith("No module named"):
