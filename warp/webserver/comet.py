@@ -8,6 +8,8 @@ except ImportError:
 from twisted.internet import reactor, error
 from twisted.web.server import NOT_DONE_YET
 
+import warp.log as log
+
 sessions = {}
 
 SESSION_TIMEOUT = 31
@@ -50,7 +52,7 @@ class CometSession(object):
             self.buffer.append(obj)
 
     def cbSessionTimeout(self):
-        print "Comet session expired:", self.id
+        log.msg("Comet session expired:", self.id)
         del sessions[self.id]
 
     def cbPollTimeout(self):
