@@ -1,5 +1,4 @@
 from __future__ import print_function
-import traceback
 from collections import defaultdict
 
 from storm.locals import Store, Storm
