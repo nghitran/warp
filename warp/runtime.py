@@ -3,13 +3,15 @@ Globally-accessible stuff (like the store) initialised at runtime, not import-ti
 """
 import sys
 
-from storm.locals import Store
-from warp.common.events import CommitEventStore
 from mako.lookup import TemplateLookup
+
+from warp.common.events import CommitEventStore
+
 
 log = sys.stdout
 
-# Thanks to _habnabit for this clever trick!
+# __new__ creates an instance but does not initialize it
+# The instance is initialized later when we have read the config
 avatar_store = CommitEventStore.__new__(CommitEventStore)
 
 # Default for app code only.
