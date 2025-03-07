@@ -1,6 +1,6 @@
 import sys
 import urllib
-import urllib2
+import warp.log as log
 
 from mako.template import Template
 
@@ -35,10 +35,13 @@ def getNode(name):
     bits = name.split('/')
     leaf = bits[-1]
 
+    # log.msg("getNode(%s): bits=%s, leaf=%s" % (name, bits, leaf))
+
     try:
         return getattr(__import__("nodes.%s" % ".".join(bits),
                                   fromlist=[leaf]), leaf, None)
     except ImportError, ie:
+        log.err("getNode(%s): ImportError: %s %r" % (name, ie, dict(ie.__dict__)))
         # Hrgh
         if ie.message.startswith("No module named"):
             return None
