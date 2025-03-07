@@ -64,14 +64,14 @@ class WarpResourceWrapper(object):
         # Init for everything except static files
         session = request.getSession()
 
-        if request.store is None:
+        if not hasattr(request, 'store') or not request.store:
             get_request_store = config.get('getRequestStore')
             if get_request_store is not None:
                 request.store = get_request_store(request)
             else:
                 request.store = avatar_store
 
-        if request.avatar is None:
+        if not hasattr(request, 'avatar') or not request.avatar:
             request.avatar = session.avatar
 
         if request.avatar is not None:
