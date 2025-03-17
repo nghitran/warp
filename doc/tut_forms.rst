@@ -91,7 +91,7 @@ code:
           year, month, day = birthdateStr.split('-')
           birthdate = datetime(int(year), int(month), int(day))
 
-      except Exception, e:
+      except Exception as e:
           return renderLocalTemplate(request, "index.mak",
                                      error=e, name=name,
                                      birthdate=birthdateStr)
