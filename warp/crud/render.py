@@ -54,9 +54,7 @@ class CrudRenderer(object):
         # Get a path to the local template relative to
         # something in Mako's templateLookup dirs.
         localNode = helpers.getCrudNode(self.crudModel).__file__
-        relPath = os.path.relpath(
-            os.path.dirname(localNode),
-            os.path.abspath("templates"))
+        relPath = os.path.relpath(os.path.dirname(localNode), os.path.abspath("templates"))
         templatePath = "/%s/%s" % (relPath, filename)
 
         return self.renderTemplate(request, templatePath)
