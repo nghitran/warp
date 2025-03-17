@@ -183,7 +183,7 @@ class CrudRenderer(object):
 
         try:
             request.store.commit()
-        except Exception, e:
+        except Exception as e:
             request.store.rollback()
             return json.dumps({
                     'success': False,
@@ -242,7 +242,7 @@ class CrudRenderer(object):
             objID = int(objID)
             klass = exposedStormClasses[className][0]
             obj = request.store.get(klass, objID)
-        except Exception, e:
+        except Exception as e:
             import traceback
             traceback.print_exc()
             return NoResource().render(request)
