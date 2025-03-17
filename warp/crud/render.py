@@ -1,5 +1,6 @@
 import tempfile
 import os.path
+import traceback
 
 try:
     import json
@@ -243,7 +244,6 @@ class CrudRenderer(object):
             klass = exposedStormClasses[className][0]
             obj = request.store.get(klass, objID)
         except Exception as e:
-            import traceback
             traceback.print_exc()
             return NoResource().render(request)
 
