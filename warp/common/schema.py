@@ -45,10 +45,7 @@ def getConfig(config=config):
     schemaConfig.update(config.get("schema", {}))
     return schemaConfig
 
-
-
 def loadWarpMigrations(store=avatar_store):
-    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
     print("Loading warp migrations...")
     warpMigrationsDir = getWarpMigrationsDir(store)
     if not warpMigrationsDir.isdir():
@@ -56,7 +53,6 @@ def loadWarpMigrations(store=avatar_store):
     commands.load(warpMigrationsDir.path)
 
 def loadSiteMigrations(config=config):
-    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
     print("Loading site migrations...")
     schemaConfig = getConfig(config)
     siteMigrationsDir = schemaConfig["migrations_dir"]
@@ -72,7 +68,6 @@ def loadMigrations(store=avatar_store, config=config):
 def snapshot(store=avatar_store, config=config, dryRun=False):
     schema = makeSchema(store, dryRun)
     if schema is None:
-        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         print("Migrations not supported for", getConnectionClassName(store))
         return
 
@@ -84,14 +79,12 @@ def snapshot(store=avatar_store, config=config, dryRun=False):
 def migrate(store=avatar_store, config=config, dryRun=False):
     schema = makeSchema(store, dryRun)
     if schema is None:
-        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         print("Migrations not supported for", getConnectionClassName(store))
         return
 
     schema.ensureSchemaTable()
 
     # Make sure the real schema is what schemup_tables says it is
-    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
     print("Checking schema integrity...")
     mismatches = validator.findSchemaMismatches(schema)
     # NTA TODO: Pretty print
@@ -103,7 +96,6 @@ def migrate(store=avatar_store, config=config, dryRun=False):
 
     loadMigrations(store, config)
 
-    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
     print("Upgrading...")
     sqls = commands.upgrade(schema, stormSchema)
 
@@ -121,15 +113,10 @@ def migrate(store=avatar_store, config=config, dryRun=False):
     store.rollback()
 
     if not sqls:
-        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         print("Schema up-to-date")
     elif dryRun:
-        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         for sql in sqls:
             print("")
             print(sql)
     else:
-        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         print("Migrated successfully")
-
-    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
