@@ -17,32 +17,69 @@ def defaultLoader():
 
 def getTranslator(language):
     lang_dict = messages.get(language, {})
+    use_fallback = language != 'en_US'
+    fallback_dict = messages.get('en_US', {}) if use_fallback else {}
 
-    def t(term, *args, **kwargs):
-        namespace = lang_dict
+    def get_namespace(base_dict, domain):
+        if domain is None:
+            return base_dict
+        try:
+            return reduce(operator.getitem, domain.split(":"), base_dict)
+        except KeyError:
+            return None
 
-        domain = kwargs.pop("_domain", None)
-        if domain is not None:
-            try:
-                namespace = reduce(operator.getitem, domain.split(":"), namespace)
-            except KeyError:
-                return u"MISSING DOMAIN: %s" % domain
-
-        translation = namespace.get(term, term)
-
+    def interpolate(text, args=None, kwargs=None):
         if args:
             try:
-                return translation % args
+                return text % args
             except TypeError:
-                return u"COULDN'T INTERPOLATE: %s // %s" % (translation, args)
-
+                return None
         if kwargs:
             try:
-                return translation % kwargs
+                return text % kwargs
             except KeyError:
-                return u"COULDN'T INTERPOLATE: %s // %s" % (translation, kwargs)
+                return None
+        return text
 
-        return translation
+    def t(term, *args, **kwargs):
+        domain = kwargs.pop("_domain", None)
+        using_fallback = False
+
+        # Get namespace from primary language
+        namespace = get_namespace(lang_dict, domain)
+        if namespace is None:
+            if not use_fallback:
+                return u"MISSING DOMAIN: %s" % domain
+            # Try fallback namespace
+            namespace = get_namespace(fallback_dict, domain)
+            if namespace is None:
+                return u"MISSING DOMAIN: %s" % domain
+            using_fallback = True
+
+        # Get translation
+        translation = namespace.get(term)
+        if translation is None:
+            if use_fallback and not using_fallback:
+                translation = get_namespace(fallback_dict, domain).get(term, term)
+            else:
+                translation = term
+
+        # Handle interpolation
+        result = interpolate(translation, args, kwargs)
+        if result is not None:
+            return result
+
+        # Try fallback interpolation
+        if use_fallback and not using_fallback:
+            fallback_translation = get_namespace(fallback_dict, domain).get(term, term)
+            result = interpolate(fallback_translation, args, kwargs)
+            if result is not None:
+                return result
+
+        # Return error if all interpolation attempts failed
+        if args:
+            return u"COULDN'T INTERPOLATE: %s // %s" % (translation, args)
+        return u"COULDN'T INTERPOLATE: %s // %s" % (translation, kwargs)
 
     return t
 
